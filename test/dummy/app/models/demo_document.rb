@@ -1,0 +1,2 @@
+class DemoDocument
+end

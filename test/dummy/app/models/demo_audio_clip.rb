@@ -1,0 +1,2 @@
+class DemoAudioClip
+end

@@ -1,7 +1,56 @@
-<div class="container mx-auto px-4 py-8">
+<div class="space-y-6">
   <%= render FlatPack::PageTitle::Component.new(
-    title: "Recording Studio Gem Template",
-    subtitle: "Use this template to build addons for Recording Studio",
+    title: "RecordingStudioIcons demo",
+    subtitle: "Configuration-driven icon resolution for RecordingStudio recordable types using semantic tokens, explicit overrides, and pluggable renderers.",
     variant: :h1
   ) %>
+
+  <%= render FlatPack::Alert::Component.new(
+    title: "What this page demonstrates",
+    description: "Addon defaults, host app token mapping, explicit host overrides, fallback behavior, and renderer dispatch. The workspace row uses a custom renderer, while token-mapped rows use the built-in Heroicons renderer.",
+    style: :info
+  ) %>
+
+  <%= render FlatPack::Card::Component.new(style: :elevated) do |card| %>
+    <% card.header do %>
+      <div>
+        <h2 class="text-lg font-semibold text-slate-900">Resolution matrix</h2>
+        <p class="mt-1 text-sm text-slate-600">The registry resolves a normalized icon reference first, then dispatches rendering through the renderer registered for that icon library.</p>
+      </div>
+    <% end %>
+
+    <% card.body do %>
+      <%= render FlatPack::Table::Component.new(data: @demo_rows) do |table| %>
+        <% table.column(title: "Example") { |row| row.label } %>
+        <% table.column(title: "Type") { |row| row.type_name } %>
+        <% table.column(title: "Source") { |row| row.source } %>
+        <% table.column(title: "Token") { |row| row.token } %>
+        <% table.column(title: "Library") { |row| row.library } %>
+        <% table.column(title: "Icon") { |row| row.icon_name } %>
+        <% table.column(title: "Variant") { |row| row.variant } %>
+        <% table.column(title: "Preview", html: ->(row) { RecordingStudioIcons.render_icon(self, row.recordable, class: "h-5 w-5") || content_tag(:span, "—") }) %>
+        <% table.column(title: "Notes") { |row| row.notes } %>
+      <% end %>
+    <% end %>
+  <% end %>
+
+  <%= render FlatPack::Card::Component.new(style: :outlined) do |card| %>
+    <% card.header do %>
+      <div>
+        <h2 class="text-lg font-semibold text-slate-900">Configured precedence</h2>
+        <p class="mt-1 text-sm text-slate-600">Resolution order is explicit and deterministic rather than depending on initializer load order.</p>
+      </div>
+    <% end %>
+
+    <% card.body do %>
+      <ol class="list-decimal space-y-2 pl-5 text-sm text-slate-700">
+        <li>Host override icon reference</li>
+        <li>Host override icon token mapped through <code>icon_token_map</code></li>
+        <li>Addon default icon reference</li>
+        <li>Addon default icon token mapped through <code>icon_token_map</code></li>
+        <li>Fallback icon reference</li>
+        <li>No icon</li>
+      </ol>
+    <% end %>
+  <% end %>
 </div>

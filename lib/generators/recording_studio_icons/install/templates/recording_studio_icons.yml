@@ -1,0 +1,11 @@
+development:
+  default_library: heroicons
+  icon_token_map:
+    document:
+      library: heroicons
+      name: document-text
+      variant: outline
+  fallback_icon:
+    library: heroicons
+    name: rectangle-stack
+    variant: outline
