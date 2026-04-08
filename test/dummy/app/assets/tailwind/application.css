@@ -1,14 +1,13 @@
 @import "tailwindcss";
 
-/* Include dummy app views for Tailwind CSS */
-@source "../../views/**/*.erb";
+/* Include the dummy app source tree */
+@source "../../..";
 
-/* Include RecordingStudio engine views for Tailwind CSS */
-@source "../../vendor/bundle/**/recording_studio/app/views/**/*.erb";
+/* Include the host engine views in this repository */
+@source "../../../../../app";
 
-
-/* Tailwind CSS - Scan FlatPack components for classes */
-@source "../../../../../../usr/local/bundle/ruby/**/bundler/gems/flatpack-*/app/components/**/*.{rb,erb}";
+/* Include FlatPack component sources from the installed bundle */
+@source "../../../../../../../usr/local/bundle/ruby/3.3.0/bundler/gems/flatpack-af0e318c4778/app/components";
 
 /* Extend Tailwind theme with FlatPack design tokens */
 @theme {
@@ -66,6 +65,9 @@
   --color-ghost-text: var(--color-fp-ghost-text);
   --color-border: var(--color-fp-border);
   --shadow-sm: var(--shadow-fp-sm);
+  --radius-md: var(--radius-md);
+  --transition-base: var(--transition-base);
+  --color-ring: var(--color-ring);
 }
 
 /* Include the engine's views in the Tailwind build */

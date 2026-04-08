@@ -1,131 +1,336 @@
-# GemTemplate
+# RecordingStudioIcons
 
-Gem template with RecordingStudio already setup. Use for extending RecordingStudio.
+RecordingStudioIcons is a configuration-driven icon registry for Ruby and Rails apps.
+It was designed to support `RecordingStudio` recordables, but it works with any class or
+type name that wants to register a default icon while keeping rendering delegated to
+library-specific renderers.
 
-## What's Included
+## Installation
 
-- **RecordingStudio** gem installed and configured
-- **Devise** authentication with a pre-seeded admin user
-- **Workspace** root recording set up following RecordingStudio's Quick Start pattern
-- **FlatPack** UI component library for all views
-- **Dummy app** (`test/dummy/`) with a working login screen and FlatPack default sidebar layout for authenticated pages
-
-## Quick Start
-
-### GitHub Codespaces (Recommended)
-
-1. Click **Code** → **Codespaces** → **Create codespace**
-2. Wait for setup to complete
-3. Run:
-   ```bash
-   cd test/dummy
-   bin/rails db:setup
-   bin/dev
-   ```
-4. Open port 3000 — you'll see the login screen
-
-The dummy app already includes FlatPack generator output (`flat_pack:install` and default sidebar layout scaffold) so authenticated pages render with the FlatPack sidebar shell by default.
-
-### Login Credentials
-
-| Field    | Value             |
-|----------|-------------------|
-| Email    | admin@admin.com   |
-| Password | Password          |
-
-The login form is prefilled with these credentials for fast access.
-
-## Architecture
-
-### Root Recording Pattern
-
-This template follows RecordingStudio's root recording pattern:
-
-- **Workspace** is the top-level recordable
-- A root `RecordingStudio::Recording` wraps the Workspace
-- The admin user has root-level admin access via `RecordingStudio::Access`
-- `Current.actor` is set from `current_user` (Devise) in `ApplicationController`
-
-### Extending RecordingStudio
-
-To add new recordable types:
-
-1. Create your model (e.g., `Page`, `Comment`)
-2. Register it in `config/initializers/recording_studio.rb`:
-   ```ruby
-   RecordingStudio.configure do |config|
-     config.recordable_types = ["Workspace", "YourNewType"]
-   end
-   ```
-3. Leave optional behavior off by default, then opt into capabilities on the specific recordable models that need them:
-   ```ruby
-   class YourNewType < ApplicationRecord
-     include RecordingStudio::Capabilities::Movable.to("Workspace")
-     include RecordingStudio::Capabilities::Copyable.to("Workspace")
-   end
-   ```
-4. If you want per-device root persistence, wire it explicitly in your controller layer:
-   ```ruby
-   class ApplicationController < ActionController::Base
-     include RecordingStudio::Concerns::DeviceSessionConcern
-   end
-   ```
-5. Create recordings under the root:
-   ```ruby
-   root_recording.record(YourNewType) do |record|
-     record.title = "Example"
-   end
-   ```
-
-### Capabilities
-
-This template uses the current RecordingStudio approach: built-in capabilities are off by default and are enabled per recordable type by including the relevant module on the model.
-
-- `movable`
-- `copyable`
-
-Device session persistence is separate from capabilities. It is enabled only when you include `RecordingStudio::Concerns::DeviceSessionConcern` in your controller layer.
-
-Enable behavior intentionally where it belongs:
+Add the gem to your application:
 
 ```ruby
-class RecordingStudioPage < ApplicationRecord
-  include RecordingStudio::Capabilities::Movable.to("Workspace")
-  include RecordingStudio::Capabilities::Copyable.to("Workspace")
-end
+gem "recording_studio_icons"
+```
 
-class ApplicationController < ActionController::Base
-  include RecordingStudio::Concerns::DeviceSessionConcern
+Then install it:
+
+```bash
+bundle install
+bin/rails generate recording_studio_icons:install
+```
+
+The install generator does three things:
+
+- mounts the engine at `/recording_studio_icons`
+- creates `config/initializers/recording_studio_icons.rb`
+- adds the engine view path to `app/assets/tailwind/application.css` when Tailwind is present
+
+The generated initializer looks like this:
+
+```ruby
+Rails.application.config.recording_studio_icons = {
+  default_library: :heroicons,
+  override_icons: {
+    "Workspace" => {
+      name: "document-text",
+      variant: :outline
+    }
+  },
+  fallback_icon: {
+    name: "rectangle-stack",
+    variant: :outline
+  }
+}
+```
+
+Default icons should be registered with the owning class or addon in Ruby code. The initializer is for
+host-app overrides and global settings.
+
+If you prefer not to use the generator, you can add the mount and initializer manually.
+
+## Why this gem exists
+
+`RecordingStudio` already normalizes recordable types to class-name strings. This gem builds on
+that pattern and adds a registry that can answer a single question for any registered type:
+
+> Which icon should represent this class or object type?
+
+The registry is intentionally **configuration-backed**, not database-backed.
+
+## What it works with
+
+The registry resolves icons for normalized type names. In practice that means you can register
+and resolve icons with:
+
+- class constants
+- class-name strings
+- symbols that normalize through the default library
+- instances of registered classes
+
+It does not require a `RecordingStudio` interface or special database schema. If the type can be
+normalized to a name and you register an icon for that name, the registry can resolve it.
+
+## Core concepts
+
+### 1. Structured icon references
+
+Concrete icons are normalized into a structured `IconReference` with:
+
+- `library`
+- `name`
+- `variant` (optional)
+- `options` (optional)
+
+Examples:
+
+```ruby
+{ library: :heroicons, name: "document-text", variant: :outline }
+{ library: :lucide, name: "file-text" }
+{ library: :custom, name: "app-document" }
+```
+
+Plain strings and symbols are also supported. They normalize through `default_library` and `default_variant`:
+
+```ruby
+# config/initializers/recording_studio_icons.rb
+Rails.application.config.recording_studio_icons = {
+  default_library: :heroicons,
+  default_variant: :solid
+}
+```
+
+```ruby
+RecordingStudioIcons.register_default_icon "MyAddon::Document", :document_text
+# => #<IconReference library=:heroicons name="document-text" variant=:solid>
+```
+
+### 2. Type-based registries
+
+The registry stores direct icon references keyed by normalized type names.
+There are separate stores for addon defaults, host-app overrides, and one optional fallback icon.
+
+## Resolution precedence
+
+Resolution is explicit and deterministic:
+
+1. host override icon reference for type
+2. addon/default icon reference for type
+3. fallback icon reference
+4. `nil`
+
+Use `RecordingStudioIcons.resolve_icon(recordable_or_type)` to get the final normalized icon reference.
+Use `RecordingStudioIcons.resolve_icon_details(recordable_or_type)` when you also want metadata such as
+which precedence layer won.
+
+## Public API
+
+```ruby
+RecordingStudioIcons.configure { |config| ... }
+RecordingStudioIcons.resolve_icon(recordable_or_type)
+RecordingStudioIcons.icon_for_type(type)
+RecordingStudioIcons.register_default_icon(type, icon_ref)
+RecordingStudioIcons.register_override_icon(type, icon_ref)
+RecordingStudioIcons.register_renderer(library, renderer)
+RecordingStudioIcons.render_icon(view_context, recordable_or_type, **options)
+```
+
+For Rails apps, prefer `Rails.application.config.recording_studio_icons = { ... }` in an initializer.
+`RecordingStudioIcons.configure` remains useful for tests and non-Rails usage.
+
+## Type normalization
+
+Type input is normalized to a class-name string:
+
+- class constant → class name string
+- string → string
+- symbol → string
+- object instance → its class name string
+
+No superclass fallback is applied.
+
+## Configuration reference
+
+`RecordingStudioIcons::Configuration` stores explicit registries for:
+
+- `default_icons`
+- `override_icons`
+- `fallback_icon`
+- `default_library`
+- `default_variant`
+- `raise_on_missing_renderer`
+
+For normal host-app setup, use a Rails initializer for host-owned settings:
+
+- `config/initializers/recording_studio_icons.rb`
+
+Register `default_icons` in the owning model, class, or addon code with `register_default_icon`.
+Use the initializer for `override_icons`, `fallback_icon`, `default_library`, `default_variant`, and
+`raise_on_missing_renderer`.
+
+The runtime Ruby API remains available for advanced extensions and tests, but it is not a
+separate automatic load source.
+
+## Engine integration
+
+The engine automatically:
+
+- includes `RecordingStudioIcons::ViewHelper` in controllers via `helper RecordingStudioIcons::ViewHelper`
+- merges `Rails.application.config.recording_studio_icons` after Rails loads initializers
+- runs lifecycle hooks before config merge, on configuration merge, and after initialization
+
+In views, you can render through the helper instead of calling the registry directly:
+
+```erb
+<%= render_recording_studio_icon(Page, class: "h-5 w-5") %>
+```
+
+Hook registration lives on `RecordingStudioIcons.configuration.hooks`:
+
+```ruby
+RecordingStudioIcons.configuration.hooks.after_initialize do
+  RecordingStudioIcons.register_renderer(:custom, MyCustomRenderer)
 end
 ```
 
-### FlatPack UI Components
+## RecordingStudio integration
 
-All views use FlatPack ViewComponents. Available components include:
+`RecordingStudio` is a natural fit because its recordables already resolve cleanly to class-name
+strings. If you are using the gem with `RecordingStudio`, you can treat each recordable type as a
+registered type in the icon registry.
 
-- `FlatPack::Button::Component` — Buttons (`:primary`, `:secondary`, `:ghost`)
-- `FlatPack::Card::Component` — Cards (`:default`, `:elevated`, `:outlined`)
-- `FlatPack::Alert::Component` — Alerts (`:success`, `:error`, `:warning`, `:info`)
-- `FlatPack::Badge::Component` — Status badges
-- `FlatPack::Table::Component` — Data tables
-- `FlatPack::TextInput::Component`, `EmailInput`, `PasswordInput` — Form inputs
-- `FlatPack::Breadcrumb::Component` — Navigation breadcrumbs
-- `FlatPack::Navbar::Component` — Navigation sidebar
+## For addon authors
 
-See the [FlatPack README](https://github.com/bowerbird-app/flatpack) for full documentation.
+Register direct icon references per type:
 
-## Tech Stack
+```ruby
+RecordingStudioIcons.register_default_icon MyAddon::Document,
+  library: :heroicons,
+  name: "document-text",
+  variant: :outline
+```
 
-| Component       | Version |
-|-----------------|---------|
-| Ruby            | 3.3+    |
-| Rails           | 8.1+    |
-| PostgreSQL      | 16      |
-| TailwindCSS     | 4       |
-| RecordingStudio | latest  |
-| FlatPack        | 0.1.2 (latest, from `bowerbird-app/flatpack`) |
-| Devise          | latest  |
+If the default library is enough, shorthand is also supported:
 
-## Documentation
+```ruby
+RecordingStudioIcons.register_default_icon MyAddon::AuditTrail, :rectangle_stack
+```
 
-The original gem template documentation is preserved in `docs/gem_template/` as architectural reference material.
+Because overrides are tracked in dedicated stores, the host app can always replace addon defaults explicitly.
+
+For a plain Rails app, the same pattern works with any model class:
+
+```ruby
+RecordingStudioIcons.register_default_icon User, :user
+RecordingStudioIcons.register_default_icon Invoice,
+  library: :heroicons,
+  name: "document-text",
+  variant: :outline
+
+RecordingStudioIcons.resolve_icon(User.new)
+```
+
+## For host app authors
+
+Set the default library used for shorthand icon references:
+
+```ruby
+# config/initializers/recording_studio_icons.rb
+Rails.application.config.recording_studio_icons = {
+  default_library: :heroicons,
+  default_variant: :solid
+}
+```
+
+Override a specific type with a concrete icon:
+
+```ruby
+# config/initializers/recording_studio_icons.rb
+Rails.application.config.recording_studio_icons = {
+  override_icons: {
+    "MyAddon::Document" => {
+      library: :custom,
+      name: "marketing-document"
+    }
+  }
+}
+```
+
+## Rendering and custom renderers
+
+Resolution and rendering are intentionally separate.
+
+```ruby
+icon = RecordingStudioIcons.resolve_icon(record)
+RecordingStudioIcons.render_icon(self, record, class: "h-5 w-5")
+```
+
+Register renderers by library key:
+
+```ruby
+RecordingStudioIcons.register_renderer :heroicons, RecordingStudioIcons::Renderers::Heroicons
+RecordingStudioIcons.register_renderer :custom, MyCustomRenderer
+```
+
+Renderers must implement:
+
+```ruby
+render(view_context, icon_reference, **options)
+```
+
+### Unknown icon library
+
+- default behavior: return `nil`
+- strict mode: raise `RecordingStudioIcons::MissingRendererError`
+
+```ruby
+# config/initializers/recording_studio_icons.rb
+Rails.application.config.recording_studio_icons = {
+  raise_on_missing_renderer: true
+}
+```
+
+## Heroicons and non-Heroicons support
+
+The gem ships with a small built-in Heroicons renderer for demo-ready usage, but the registry is not Heroicons-only.
+Any library key can be registered, including internal systems:
+
+```ruby
+RecordingStudioIcons.register_renderer :custom, MyApp::IconRenderer
+RecordingStudioIcons.register_override_icon MyAddon::Folder,
+  library: :custom,
+  name: "workspace-folder"
+```
+
+## Dummy app demo
+
+The dummy app intentionally uses FlatPack components wherever practical.
+It demonstrates:
+
+- addon concrete defaults
+- host overrides
+- fallback behavior
+- multi-library rendering (`:heroicons` plus a custom renderer)
+- resolved metadata shown in the UI
+
+Run it with:
+
+```bash
+cd test/dummy
+bin/rails db:setup
+bin/dev
+```
+
+Then sign in at `http://localhost:3000` with:
+
+- Email: `admin@admin.com`
+- Password: `Password`
+
+The dummy app root path contains the richer registry demo and guide pages. The mounted engine
+home page is also available at `http://localhost:3000/recording_studio_icons`.
+
+## Archival template docs
+
+The files under `docs/gem_template/` are preserved template documentation from the source gem
+template. They are architecture reference only and do not describe the current
+`recording_studio_icons` installation or API surface.

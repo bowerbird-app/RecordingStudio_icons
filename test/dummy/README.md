@@ -1,24 +1,26 @@
-# README
+# RecordingStudioIcons dummy app
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+This dummy app demonstrates `recording_studio_icons` end-to-end with the real public API.
 
-Things you may want to cover:
+## What the demo shows
 
-* Ruby version
+- addon-style default icon references
+- explicit host overrides that beat addon defaults
+- fallback icon behavior
+- renderer dispatch across multiple libraries (`:heroicons` and a dummy `:custom` renderer)
+- FlatPack components for the demo UI (`PageTitle`, `Alert`, `Card`, and `Table`)
 
-* System dependencies
+## Run the dummy app
 
-* Configuration
+```bash
+cd test/dummy
+bin/rails db:setup
+bin/dev
+```
 
-* Database creation
+Then sign in at `http://localhost:3000` with:
 
-* Database initialization
+- Email: `admin@admin.com`
+- Password: `Password`
 
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
+The home page is the icon registry demo.

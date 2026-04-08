@@ -1,0 +1,70 @@
+<div class="space-y-10">
+  <%= render FlatPack::PageTitle::Component.new(
+    title: "Configuration reference",
+    subtitle: "Set the defaults used when shorthand icon names are normalized.",
+    variant: :h1
+  ) %>
+
+  <section class="space-y-4">
+    <%= render FlatPack::SectionTitle::Component.new(
+      title: "Default library",
+      subtitle: "Use a Rails initializer to choose the library and variant for string and symbol icon references.",
+      anchor_link: true,
+      anchor_id: "load-sources"
+    ) %>
+
+    <%= render FlatPack::CodeBlock::Component.new(
+      title: "config/initializers/recording_studio_icons.rb",
+      code: @configuration_flags_example,
+      language: "ruby",
+      separated: false
+    ) %>
+  </section>
+
+  <section class="space-y-4">
+    <%= render FlatPack::SectionTitle::Component.new(
+      title: "Fallback icon",
+      subtitle: "Use this to show one global icon when a type has no override or default icon mapping.",
+      anchor_link: true,
+      anchor_id: "fallback-icon"
+    ) %>
+
+    <%= render FlatPack::CodeBlock::Component.new(
+      title: "Fallback example",
+      code: @configuration_fallback_example,
+      language: "ruby",
+      separated: false
+    ) %>
+  </section>
+
+  <section class="space-y-4">
+    <%= render FlatPack::SectionTitle::Component.new(
+      title: "Override icons",
+      subtitle: "Use this when the app needs to override icons registered by other gems.",
+      anchor_link: true,
+      anchor_id: "override-icons"
+    ) %>
+
+    <%= render FlatPack::CodeBlock::Component.new(
+      title: "Override examples",
+      snippets: @configuration_override_examples,
+      separated: false
+    ) %>
+  </section>
+
+  <section class="space-y-4">
+    <%= render FlatPack::SectionTitle::Component.new(
+      title: "Unknown icon library",
+      subtitle: "Use this flag to raise when an icon resolves successfully but its library has no registered renderer.",
+      anchor_link: true,
+      anchor_id: "unknown-icon-library"
+    ) %>
+
+    <%= render FlatPack::CodeBlock::Component.new(
+      title: "Strict library example",
+      code: @configuration_unknown_library_example,
+      language: "ruby",
+      separated: false
+    ) %>
+  </section>
+</div>

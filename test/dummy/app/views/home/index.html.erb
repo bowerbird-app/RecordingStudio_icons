@@ -1,7 +1,23 @@
-<div class="container mx-auto px-4 py-8">
+<div class="space-y-6">
   <%= render FlatPack::PageTitle::Component.new(
-    title: "Recording Studio Gem Template",
-    subtitle: "Use this template to build addons for Recording Studio",
+    title: "RecordingStudioIcons demo",
+    subtitle: "Set default icons for registered types, shown here with RecordingStudio models",
     variant: :h1
   ) %>
+
+  <%= render FlatPack::Table::Component.new(
+    data: @demo_rows,
+    style: "border: 0; border-radius: 0; box-shadow: none; background: transparent;"
+  ) do |table| %>
+    <% table.column(title: "Icon", html: ->(row) {
+      RecordingStudioIcons.render_icon(self, row.recordable, class: "h-5 w-5") || content_tag(:span, "-", aria: { hidden: true })
+    }) %>
+    <% table.column(title: "Type") { |row| row.type_name.to_s.downcase } %>
+    <% table.column(title: "Where Set") { |row| row.icon_set_in } %>
+    <% table.column(title: "Count") { |row| row.count } %>
+  <% end %>
+
+  <div class="max-w-3xl text-sm leading-6 text-(--surface-muted-content-color)">
+    This demo uses RecordingStudio models, but the same registry API works for any class that registers a default icon.
+  </div>
 </div>

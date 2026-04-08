@@ -7,6 +7,7 @@ class ApplicationController < ActionController::Base
 
   layout :application_layout
 
+  before_action :ensure_demo_data, if: :development_mode?
   before_action :authenticate_user!
   before_action :set_current_actor
 
@@ -14,6 +15,14 @@ class ApplicationController < ActionController::Base
 
   def application_layout
     devise_controller? ? "application" : "flat_pack_sidebar"
+  end
+
+  def development_mode?
+    Rails.env.development?
+  end
+
+  def ensure_demo_data
+    Dummy::DemoData.ensure!
   end
 
   def set_current_actor

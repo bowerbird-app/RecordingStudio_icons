@@ -2,7 +2,7 @@
   <% sidebar.header do %>
     <%= render FlatPack::Sidebar::Header::Component.new(
       brand_abbr: "RS",
-      title: "Template",
+      title: "Icons",
       subtitle: "Workspace"
     ) %>
   <% end %>
@@ -11,8 +11,30 @@
     <nav class="py-4 space-y-1" aria-label="Main navigation">
       <%= render FlatPack::Sidebar::Item::Component.new(
         label: "Home",
-        href: "/",
-        icon: :home
+        href: root_path,
+        icon: :home,
+        active: current_page?(root_path)
+      ) %>
+
+      <%= render FlatPack::Sidebar::Item::Component.new(
+        label: "Use icon",
+        href: basic_use_guide_path,
+        icon: :code_bracket,
+        active: current_page?(basic_use_guide_path)
+      ) %>
+
+      <%= render FlatPack::Sidebar::Item::Component.new(
+        label: "Set icon",
+        href: set_icon_guide_path,
+        icon: :bookmark_square,
+        active: current_page?(set_icon_guide_path)
+      ) %>
+
+      <%= render FlatPack::Sidebar::Item::Component.new(
+        label: "Configuration",
+        href: configuration_reference_guide_path,
+        icon: :cog_6_tooth,
+        active: current_page?(configuration_reference_guide_path)
       ) %>
 
     </nav>
