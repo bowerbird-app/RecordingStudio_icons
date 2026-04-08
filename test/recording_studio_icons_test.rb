@@ -21,13 +21,14 @@ class RecordingStudioIconsTest < Minitest::Test
   end
 
   def test_dummy_app_configures_icon_registry_demo
-    config_path = File.expand_path("dummy/config/recording_studio_icons.yml", __dir__)
+    config_path = File.expand_path("dummy/config/initializers/recording_studio_icons.rb", __dir__)
     config_source = File.read(config_path)
     application_controller_path = File.expand_path("dummy/app/controllers/application_controller.rb", __dir__)
     controller_source = File.read(application_controller_path)
 
-    assert_includes config_source, "default_library: heroicons"
-    assert_includes config_source, "Workspace:"
+    assert_includes config_source, "Rails.application.config.recording_studio_icons"
+    assert_includes config_source, '"Workspace" =>'
+    assert_includes config_source, '"RecordingStudio::Access" =>'
     refute_includes controller_source, "reset_configuration!"
     refute_includes controller_source, "reset_renderers!"
   end

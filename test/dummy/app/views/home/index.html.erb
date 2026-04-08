@@ -13,6 +13,7 @@
       RecordingStudioIcons.render_icon(self, row.recordable, class: "h-5 w-5") || content_tag(:span, "-", aria: { hidden: true })
     }) %>
     <% table.column(title: "Type") { |row| row.type_name.to_s.downcase } %>
+    <% table.column(title: "Where Set") { |row| row.icon_set_in } %>
     <% table.column(title: "Count") { |row| row.count } %>
   <% end %>
 

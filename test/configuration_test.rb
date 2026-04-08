@@ -78,7 +78,7 @@ class ConfigurationTest < Minitest::Test
   end
 
   def test_merge_accepts_each_enumerables
-    @configuration.merge!([[:default_library, :custom], [:default_variant, :solid]])
+    @configuration.merge!([%i[default_library custom], %i[default_variant solid]])
 
     assert_equal :custom, @configuration.default_library
     assert_equal :solid, @configuration.default_variant
@@ -100,6 +100,14 @@ class ConfigurationTest < Minitest::Test
     assert_raises(RecordingStudioIcons::InvalidConfigurationError) do
       @configuration.default_variant = "  "
     end
+  end
+
+  def test_default_variant_accepts_nil
+    @configuration.default_variant = :solid
+
+    @configuration.default_variant = nil
+
+    assert_nil @configuration.default_variant
   end
 
   def test_default_variant_applies_to_shorthand_icon_references

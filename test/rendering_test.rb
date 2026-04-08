@@ -79,6 +79,46 @@ class RenderingTest < Minitest::Test
     assert_includes result, "<path"
   end
 
+  def test_heroicons_renderer_allows_safe_svg_options
+    icon = RecordingStudioIcons::IconReference.new(library: :heroicons, name: "folder", variant: :outline)
+
+    result = RecordingStudioIcons::Renderers::Heroicons.render(
+      ActionController::Base.helpers,
+      icon,
+      class: "h-5 w-5",
+      width: 20,
+      height: 20,
+      stroke_width: 2,
+      role: "img",
+      aria: { hidden: true },
+      data: { testid: "folder-icon" }
+    )
+
+    assert_includes result, 'width="20"'
+    assert_includes result, 'height="20"'
+    assert_includes result, 'stroke-width="2"'
+    assert_includes result, 'role="img"'
+    assert_includes result, 'aria-hidden="true"'
+    assert_includes result, 'data-testid="folder-icon"'
+  end
+
+  def test_heroicons_renderer_filters_unsafe_svg_options
+    icon = RecordingStudioIcons::IconReference.new(library: :heroicons, name: "folder", variant: :outline)
+
+    result = RecordingStudioIcons::Renderers::Heroicons.render(
+      ActionController::Base.helpers,
+      icon,
+      class: "h-5 w-5",
+      onclick: "alert(1)",
+      onload: "alert(1)",
+      viewBox: "0 0 10 10"
+    )
+
+    refute_includes result, "onclick"
+    refute_includes result, "onload"
+    assert_includes result, 'viewBox="0 0 24 24"'
+  end
+
   def test_heroicons_renderer_falls_back_to_action_controller_helpers
     icon = RecordingStudioIcons::IconReference.new(library: :heroicons, name: "document-text", variant: :outline)
 

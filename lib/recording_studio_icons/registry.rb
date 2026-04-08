@@ -60,18 +60,14 @@ module RecordingStudioIcons
       ResolutionResult.new(type_name: type_name, icon: nil, source: :none)
     end
 
-    def render_icon(view_context, recordable_or_type, **options)
+    def render_icon(view_context, recordable_or_type, **)
       icon_reference = resolve_icon(recordable_or_type)
       return nil unless icon_reference
 
-      renderer = renderer_registry.fetch(icon_reference.library)
-      if renderer.nil?
-        raise MissingRendererError, "No renderer registered for #{icon_reference.library.inspect}" if configuration.raise_on_missing_renderer
+      renderer = fetch_renderer(icon_reference)
+      return nil unless renderer
 
-        return nil
-      end
-
-      renderer.render(view_context, icon_reference, **options)
+      renderer.render(view_context, icon_reference, **)
     end
 
     def normalize_icon_reference(icon_reference)
@@ -90,6 +86,15 @@ module RecordingStudioIcons
 
     def register_builtin_renderers
       @renderer_registry.register(:heroicons, Renderers::Heroicons)
+    end
+
+    def fetch_renderer(icon_reference)
+      renderer = renderer_registry.fetch(icon_reference.library)
+      return renderer if renderer
+      return nil unless configuration.raise_on_missing_renderer
+
+      raise MissingRendererError,
+            "No renderer registered for #{icon_reference.library.inspect}"
     end
   end
 end

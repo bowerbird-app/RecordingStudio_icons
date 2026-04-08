@@ -4,17 +4,31 @@ module RecordingStudioIcons
   class IconReference
     attr_reader :library, :name, :variant, :options
 
-    def self.normalize(value, default_library: nil, default_variant: nil)
-      return if value.nil?
-      return value if value.is_a?(self)
+    class << self
+      def normalize(value, default_library: nil, default_variant: nil)
+        return if value.nil?
+        return value if value.is_a?(IconReference)
 
-      case value
-      when String
-        new(library: default_library, name: value, variant: default_variant)
-      when Symbol
-        new(library: default_library, name: value.to_s.tr("_", "-"), variant: default_variant)
-      when Hash
-        symbolized = value.each_with_object({}) { |(key, item), memo| memo[key.to_sym] = item }
+        build_reference(value, default_library:, default_variant:)
+      end
+
+      private
+
+      def build_reference(value, default_library:, default_variant:)
+        case value
+        when String
+          new(library: default_library, name: value, variant: default_variant)
+        when Symbol
+          new(library: default_library, name: value.to_s.tr("_", "-"), variant: default_variant)
+        when Hash
+          build_from_hash(value, default_library:, default_variant:)
+        else
+          raise InvalidIconReferenceError, "Unsupported icon reference: #{value.inspect}"
+        end
+      end
+
+      def build_from_hash(value, default_library:, default_variant:)
+        symbolized = value.transform_keys(&:to_sym)
         name = symbolized[:name]
         raise InvalidIconReferenceError, "Icon reference name is required" if blank?(name)
 
@@ -24,8 +38,10 @@ module RecordingStudioIcons
           variant: symbolized[:variant] || default_variant,
           options: symbolized[:options] || {}
         )
-      else
-        raise InvalidIconReferenceError, "Unsupported icon reference: #{value.inspect}"
+      end
+
+      def blank?(value)
+        value.nil? || value.to_s.strip.empty?
       end
     end
 
@@ -37,7 +53,7 @@ module RecordingStudioIcons
       @library = library.to_sym
       @name = normalize_name(name)
       @variant = variant&.to_sym
-      @options = options.each_with_object({}) { |(key, value), memo| memo[key.to_sym] = value }.freeze
+      @options = options.transform_keys(&:to_sym).freeze
       freeze
     end
 
@@ -65,12 +81,8 @@ module RecordingStudioIcons
       value.is_a?(Symbol) ? value.to_s.tr("_", "-") : value.to_s
     end
 
-    def self.blank?(value)
-      value.nil? || value.to_s.strip.empty?
-    end
-
     def blank?(value)
-      self.class.blank?(value)
+      self.class.send(:blank?, value)
     end
   end
 end

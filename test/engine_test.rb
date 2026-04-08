@@ -27,7 +27,9 @@ class EngineTest < Minitest::Test
     assert after_called
   end
 
-  def test_load_config_merges_yaml_source_and_runs_on_configuration_hook
+  ConfigStub = Struct.new(:recording_studio_icons)
+
+  def test_load_config_merges_initializer_source_and_runs_on_configuration_hook
     hook_called = false
     hook_payload = nil
     RecordingStudioIcons.configuration.hooks.on_configuration do |cfg|
@@ -35,18 +37,14 @@ class EngineTest < Minitest::Test
       hook_payload = cfg
     end
 
-    config_paths = {
-      "config/recording_studio_icons.yml" => Struct.new(:existent).new(["config/recording_studio_icons.yml"])
-    }
-    app_config = Struct.new(:paths).new(config_paths)
-    app = Struct.new(:config) do
-      def config_for(_name)
+    app = Struct.new(:config).new(
+      ConfigStub.new(
         {
           default_library: :custom,
           default_icons: { "Workspace" => { library: :heroicons, name: "folder", variant: :outline } }
         }
-      end
-    end.new(app_config)
+      )
+    )
 
     find_initializer("recording_studio_icons.load_config").block.call(app)
 
@@ -56,16 +54,8 @@ class EngineTest < Minitest::Test
     assert_equal "folder", RecordingStudioIcons.configuration.default_icons["Workspace"].name
   end
 
-  def test_load_config_ignores_missing_yaml_file_errors
-    config_paths = {
-      "config/recording_studio_icons.yml" => Struct.new(:existent).new(["config/recording_studio_icons.yml"])
-    }
-    app_config = Struct.new(:paths).new(config_paths)
-    app = Struct.new(:config) do
-      def config_for(_name)
-        raise "missing file"
-      end
-    end.new(app_config)
+  def test_load_config_is_noop_when_initializer_config_is_absent
+    app = Struct.new(:config).new(Object.new)
 
     find_initializer("recording_studio_icons.load_config").block.call(app)
 

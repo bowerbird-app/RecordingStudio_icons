@@ -14,8 +14,9 @@ module RecordingStudioIcons
       RecordingStudioIcons::Hooks.run(:before_initialize, self)
     end
 
-    initializer "recording_studio_icons.load_config" do |app|
-      ConfigLoader.load!(app, configuration: RecordingStudioIcons.configuration)
+    initializer "recording_studio_icons.load_config", after: :load_config_initializers do |app|
+      host_config = app.config.respond_to?(:recording_studio_icons) ? app.config.recording_studio_icons : nil
+      RecordingStudioIcons.configuration.merge!(host_config)
 
       RecordingStudioIcons::Hooks.run(:on_configuration, RecordingStudioIcons.configuration)
     end

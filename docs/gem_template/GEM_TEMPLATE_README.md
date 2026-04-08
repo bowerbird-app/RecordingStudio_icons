@@ -8,6 +8,8 @@
 
 > **📌 Note:** This documentation directory (`docs/gem_template/`) is preserved during gem renaming and serves as architectural reference material. When you rename your gem, these files intentionally remain under `gem_template` to document the original template structure.
 
+> **Status for this repository:** These files are archival template reference, not the live setup guide for `RecordingStudioIcons`. Use `README.md` for the current gem API and installation flow, and `test/dummy/README.md` for the runnable demo app.
+
 ---
 
 # GemTemplate

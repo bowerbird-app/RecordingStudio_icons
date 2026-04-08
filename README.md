@@ -5,6 +5,50 @@ It was designed to support `RecordingStudio` recordables, but it works with any 
 type name that wants to register a default icon while keeping rendering delegated to
 library-specific renderers.
 
+## Installation
+
+Add the gem to your application:
+
+```ruby
+gem "recording_studio_icons"
+```
+
+Then install it:
+
+```bash
+bundle install
+bin/rails generate recording_studio_icons:install
+```
+
+The install generator does three things:
+
+- mounts the engine at `/recording_studio_icons`
+- creates `config/initializers/recording_studio_icons.rb`
+- adds the engine view path to `app/assets/tailwind/application.css` when Tailwind is present
+
+The generated initializer looks like this:
+
+```ruby
+Rails.application.config.recording_studio_icons = {
+  default_library: :heroicons,
+  override_icons: {
+    "Workspace" => {
+      name: "document-text",
+      variant: :outline
+    }
+  },
+  fallback_icon: {
+    name: "rectangle-stack",
+    variant: :outline
+  }
+}
+```
+
+Default icons should be registered with the owning class or addon in Ruby code. The initializer is for
+host-app overrides and global settings.
+
+If you prefer not to use the generator, you can add the mount and initializer manually.
+
 ## Why this gem exists
 
 `RecordingStudio` already normalizes recordable types to class-name strings. This gem builds on
@@ -48,11 +92,12 @@ Examples:
 
 Plain strings and symbols are also supported. They normalize through `default_library` and `default_variant`:
 
-```yaml
-# config/recording_studio_icons.yml
-development:
-  default_library: heroicons
-  default_variant: solid
+```ruby
+# config/initializers/recording_studio_icons.rb
+Rails.application.config.recording_studio_icons = {
+  default_library: :heroicons,
+  default_variant: :solid
+}
 ```
 
 ```ruby
@@ -90,6 +135,9 @@ RecordingStudioIcons.register_renderer(library, renderer)
 RecordingStudioIcons.render_icon(view_context, recordable_or_type, **options)
 ```
 
+For Rails apps, prefer `Rails.application.config.recording_studio_icons = { ... }` in an initializer.
+`RecordingStudioIcons.configure` remains useful for tests and non-Rails usage.
+
 ## Type normalization
 
 Type input is normalized to a class-name string:
@@ -112,12 +160,38 @@ No superclass fallback is applied.
 - `default_variant`
 - `raise_on_missing_renderer`
 
-The engine also follows the same configuration-loading shape as `RecordingStudio`:
+For normal host-app setup, use a Rails initializer for host-owned settings:
 
-- `config/recording_studio_icons.yml`
+- `config/initializers/recording_studio_icons.rb`
 
-For normal host-app setup, use the config file. The runtime Ruby API remains available for
-advanced extensions and tests, but it is not a separate automatic load source.
+Register `default_icons` in the owning model, class, or addon code with `register_default_icon`.
+Use the initializer for `override_icons`, `fallback_icon`, `default_library`, `default_variant`, and
+`raise_on_missing_renderer`.
+
+The runtime Ruby API remains available for advanced extensions and tests, but it is not a
+separate automatic load source.
+
+## Engine integration
+
+The engine automatically:
+
+- includes `RecordingStudioIcons::ViewHelper` in controllers via `helper RecordingStudioIcons::ViewHelper`
+- merges `Rails.application.config.recording_studio_icons` after Rails loads initializers
+- runs lifecycle hooks before config merge, on configuration merge, and after initialization
+
+In views, you can render through the helper instead of calling the registry directly:
+
+```erb
+<%= render_recording_studio_icon(Page, class: "h-5 w-5") %>
+```
+
+Hook registration lives on `RecordingStudioIcons.configuration.hooks`:
+
+```ruby
+RecordingStudioIcons.configuration.hooks.after_initialize do
+  RecordingStudioIcons.register_renderer(:custom, MyCustomRenderer)
+end
+```
 
 ## RecordingStudio integration
 
@@ -160,22 +234,26 @@ RecordingStudioIcons.resolve_icon(User.new)
 
 Set the default library used for shorthand icon references:
 
-```yaml
-# config/recording_studio_icons.yml
-development:
-  default_library: heroicons
-  default_variant: solid
+```ruby
+# config/initializers/recording_studio_icons.rb
+Rails.application.config.recording_studio_icons = {
+  default_library: :heroicons,
+  default_variant: :solid
+}
 ```
 
 Override a specific type with a concrete icon:
 
-```yaml
-# config/recording_studio_icons.yml
-development:
-  override_icons:
-    MyAddon::Document:
-      library: custom
-      name: marketing-document
+```ruby
+# config/initializers/recording_studio_icons.rb
+Rails.application.config.recording_studio_icons = {
+  override_icons: {
+    "MyAddon::Document" => {
+      library: :custom,
+      name: "marketing-document"
+    }
+  }
+}
 ```
 
 ## Rendering and custom renderers
@@ -200,15 +278,16 @@ Renderers must implement:
 render(view_context, icon_reference, **options)
 ```
 
-### Missing renderer behavior
+### Unknown icon library
 
 - default behavior: return `nil`
 - strict mode: raise `RecordingStudioIcons::MissingRendererError`
 
-```yaml
-# config/recording_studio_icons.yml
-development:
+```ruby
+# config/initializers/recording_studio_icons.rb
+Rails.application.config.recording_studio_icons = {
   raise_on_missing_renderer: true
+}
 ```
 
 ## Heroicons and non-Heroicons support
@@ -242,9 +321,16 @@ bin/rails db:setup
 bin/dev
 ```
 
-Sign in with:
+Then sign in at `http://localhost:3000` with:
 
 - Email: `admin@admin.com`
 - Password: `Password`
 
-The home page contains the demo table and precedence explanation.
+The dummy app root path contains the richer registry demo and guide pages. The mounted engine
+home page is also available at `http://localhost:3000/recording_studio_icons`.
+
+## Archival template docs
+
+The files under `docs/gem_template/` are preserved template documentation from the source gem
+template. They are architecture reference only and do not describe the current
+`recording_studio_icons` installation or API surface.

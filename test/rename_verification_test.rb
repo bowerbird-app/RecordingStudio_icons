@@ -307,9 +307,11 @@ class RenameVerificationTest < Minitest::Test
   end
 
   def test_gem_is_loadable_with_rails
-    # This test requires Rails - run within the dummy app context
-    # Skip if Rails is not available
-    skip("Rails not loaded - run within dummy app") unless defined?(::Rails::Engine)
+    begin
+      require "rails/engine" unless defined?(::Rails::Engine)
+    rescue LoadError
+      skip("Rails not available in current bundle")
+    end
 
     begin
       require @gem_name

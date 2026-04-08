@@ -67,4 +67,8 @@ class RegistryTest < Minitest::Test
     assert_equal "registry-rendered", result
     assert_equal :custom, StubRenderer.last_icon.library
   end
+
+  def test_render_icon_returns_nil_when_no_icon_is_registered
+    assert_nil @registry.render_icon(Object.new, RegistryType)
+  end
 end

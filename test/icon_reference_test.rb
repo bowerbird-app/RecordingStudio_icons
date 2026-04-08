@@ -3,6 +3,16 @@
 require "test_helper"
 
 class IconReferenceTest < Minitest::Test
+  def test_nil_normalization_returns_nil
+    assert_nil RecordingStudioIcons::IconReference.normalize(nil)
+  end
+
+  def test_existing_icon_reference_is_returned_as_is
+    icon = RecordingStudioIcons::IconReference.new(library: :heroicons, name: "document-text", variant: :outline)
+
+    assert_same icon, RecordingStudioIcons::IconReference.normalize(icon)
+  end
+
   def test_string_normalization_uses_default_library
     icon = RecordingStudioIcons::IconReference.normalize("document-text", default_library: :heroicons)
 

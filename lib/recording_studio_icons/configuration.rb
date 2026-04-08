@@ -3,17 +3,46 @@
 require_relative "hooks"
 
 module RecordingStudioIcons
-  class Configuration
+  module ConfigurationHelpers
     VALID_KEYS = %w[
-      default_icons
-      override_icons
-      fallback_icon
-      default_library
-      default_variant
-      raise_on_missing_renderer
+      default_icons override_icons fallback_icon default_library default_variant raise_on_missing_renderer
     ].freeze
 
-    attr_reader :hooks
+    module_function
+
+    def normalize_hash(hash)
+      return hash.to_h if hash.respond_to?(:to_h)
+      return hash.each_pair.to_h if hash.respond_to?(:each_pair)
+      return hash.each.to_h if hash.respond_to?(:each)
+
+      raise InvalidConfigurationError, "Configuration must be hash-like"
+    end
+
+    def normalize_library(library)
+      raise InvalidConfigurationError, "default_library is required" if library.nil? || library.to_s.strip.empty?
+
+      library.to_sym
+    end
+
+    def normalize_variant(variant)
+      return nil if variant.nil?
+
+      normalized_variant = variant.to_s.strip
+      raise InvalidConfigurationError, "default_variant is required" if normalized_variant.empty?
+
+      normalized_variant.to_sym
+    end
+  end
+
+  class Configuration
+    MAP_MERGERS = { "default_icons" => :default_icon, "override_icons" => :override_icon }.freeze
+    ATTRIBUTE_WRITERS = {
+      "fallback_icon" => :fallback_icon=, "default_library" => :default_library=,
+      "default_variant" => :default_variant=, "raise_on_missing_renderer" => :raise_on_missing_renderer=
+    }.freeze
+
+    attr_reader :hooks, :default_library, :default_variant, :raise_on_missing_renderer, :default_icons,
+                :override_icons, :fallback_icon
 
     def initialize
       @default_icons = {}.freeze
@@ -26,32 +55,20 @@ module RecordingStudioIcons
       @mutex = Mutex.new
     end
 
-    def default_library
-      @default_library
-    end
-
     def default_library=(library)
-      normalized_library = normalize_library(library)
+      normalized_library = ConfigurationHelpers.normalize_library(library)
 
       @mutex.synchronize do
         @default_library = normalized_library
       end
     end
 
-    def default_variant
-      @default_variant
-    end
-
     def default_variant=(variant)
-      normalized_variant = normalize_variant(variant)
+      normalized_variant = ConfigurationHelpers.normalize_variant(variant)
 
       @mutex.synchronize do
         @default_variant = normalized_variant
       end
-    end
-
-    def raise_on_missing_renderer
-      @raise_on_missing_renderer
     end
 
     def raise_on_missing_renderer=(value)
@@ -60,30 +77,18 @@ module RecordingStudioIcons
       end
     end
 
-    def default_icons
-      @default_icons
-    end
-
-    def override_icons
-      @override_icons
-    end
-
     def default_icon(type, icon_reference)
-      update_map(:@default_icons, normalize_type(type), normalize_icon_reference(icon_reference))
+      update_map(:@default_icons, TypeNormalizer.call(type), normalize_icon_reference(icon_reference))
     end
 
     def override_icon(type, icon_reference)
-      update_map(:@override_icons, normalize_type(type), normalize_icon_reference(icon_reference))
+      update_map(:@override_icons, TypeNormalizer.call(type), normalize_icon_reference(icon_reference))
     end
 
     def fallback_icon=(icon_reference)
       @mutex.synchronize do
         @fallback_icon = normalize_icon_reference(icon_reference)
       end
-    end
-
-    def fallback_icon
-      @fallback_icon
     end
 
     def to_h
@@ -101,26 +106,11 @@ module RecordingStudioIcons
     def merge!(hash)
       return self if hash.nil?
 
-      config_hash = normalize_hash(hash)
+      config_hash = ConfigurationHelpers.normalize_hash(hash)
       validate_keys!(config_hash)
 
       config_hash.each do |key, value|
-        case key.to_s
-        when "default_icons"
-          merge_type_map(value) { |type, icon| default_icon(type, icon) }
-        when "override_icons"
-          merge_type_map(value) { |type, icon| override_icon(type, icon) }
-        when "fallback_icon"
-          self.fallback_icon = value
-        when "default_library"
-          self.default_library = value
-        when "default_variant"
-          self.default_variant = value
-        when "raise_on_missing_renderer"
-          self.raise_on_missing_renderer = value
-        else
-          raise InvalidConfigurationError, "Unknown configuration key: #{key}"
-        end
+        apply_configuration_entry(key.to_s, value)
       end
 
       self
@@ -135,30 +125,12 @@ module RecordingStudioIcons
       end
     end
 
-    def merge_type_map(hash)
-      normalize_hash(hash).each do |key, value|
-        yield(key, value)
-      end
-    end
-
-    def normalize_hash(hash)
-      return hash.to_h if hash.respond_to?(:to_h)
-
-      if hash.respond_to?(:each_pair)
-        hash.each_pair.each_with_object({}) do |(key, value), memo|
-          memo[key] = value
-        end
-      elsif hash.respond_to?(:each)
-        hash.each_with_object({}) do |(key, value), memo|
-          memo[key] = value
-        end
-      else
-        raise InvalidConfigurationError, "Configuration must be hash-like"
-      end
+    def merge_type_map(hash, &)
+      ConfigurationHelpers.normalize_hash(hash).each(&)
     end
 
     def validate_keys!(config_hash)
-      unknown_keys = config_hash.keys.map(&:to_s) - VALID_KEYS
+      unknown_keys = config_hash.keys.map(&:to_s) - ConfigurationHelpers::VALID_KEYS
       return if unknown_keys.empty?
 
       raise InvalidConfigurationError, "Unknown configuration keys: #{unknown_keys.join(', ')}"
@@ -172,23 +144,12 @@ module RecordingStudioIcons
       )
     end
 
-    def normalize_library(library)
-      raise InvalidConfigurationError, "default_library is required" if library.nil? || library.to_s.strip.empty?
-
-      library.to_sym
-    end
-
-    def normalize_variant(variant)
-      return nil if variant.nil?
-
-      normalized_variant = variant.to_s.strip
-      raise InvalidConfigurationError, "default_variant is required" if normalized_variant.empty?
-
-      normalized_variant.to_sym
-    end
-
-    def normalize_type(type)
-      TypeNormalizer.call(type)
+    def apply_configuration_entry(key, value)
+      if MAP_MERGERS.key?(key)
+        merge_type_map(value) { |type, icon| public_send(MAP_MERGERS.fetch(key), type, icon) }
+      else
+        public_send(ATTRIBUTE_WRITERS.fetch(key), value)
+      end
     end
   end
 end

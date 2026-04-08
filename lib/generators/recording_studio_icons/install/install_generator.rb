@@ -11,8 +11,8 @@ module RecordingStudioIcons
         route 'mount RecordingStudioIcons::Engine, at: "/recording_studio_icons"'
       end
 
-      def add_yaml_config
-        template "recording_studio_icons.yml", "config/recording_studio_icons.yml"
+      def add_initializer_config
+        template "recording_studio_icons.rb", "config/initializers/recording_studio_icons.rb"
       end
 
       def add_tailwind_source

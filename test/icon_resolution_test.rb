@@ -29,7 +29,8 @@ class IconResolutionTest < Minitest::Test
   end
 
   def test_default_icon_registration
-    RecordingStudioIcons.register_default_icon(DocumentType, { library: :heroicons, name: "document-text", variant: :outline })
+    RecordingStudioIcons.register_default_icon(DocumentType,
+                                               { library: :heroicons, name: "document-text", variant: :outline })
 
     result = RecordingStudioIcons.resolve_icon_details(DocumentType)
 
@@ -48,7 +49,8 @@ class IconResolutionTest < Minitest::Test
 
   def test_override_icon_takes_precedence_over_default_icon
     RecordingStudioIcons.register_default_icon(CommentType, { library: :custom, name: "comment-default" })
-    RecordingStudioIcons.register_override_icon(CommentType, { library: :heroicons, name: "comment-override", variant: :solid })
+    RecordingStudioIcons.register_override_icon(CommentType,
+                                                { library: :heroicons, name: "comment-override", variant: :solid })
 
     result = RecordingStudioIcons.resolve_icon_details(CommentType)
 
@@ -57,7 +59,8 @@ class IconResolutionTest < Minitest::Test
   end
 
   def test_override_icon_takes_precedence_over_default_icons
-    RecordingStudioIcons.register_default_icon(AudioType, { library: :heroicons, name: "speaker-wave", variant: :outline })
+    RecordingStudioIcons.register_default_icon(AudioType,
+                                               { library: :heroicons, name: "speaker-wave", variant: :outline })
     RecordingStudioIcons.register_override_icon(AudioType, { library: :custom, name: "audio-override" })
 
     result = RecordingStudioIcons.resolve_icon_details(AudioType)

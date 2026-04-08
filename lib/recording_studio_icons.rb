@@ -11,7 +11,6 @@ require "recording_studio_icons/view_helper"
 require "recording_studio_icons/renderers/heroicons"
 require "recording_studio_icons/hooks"
 require "recording_studio_icons/configuration"
-require "recording_studio_icons/config_loader"
 require "recording_studio_icons/engine"
 
 module RecordingStudioIcons
@@ -32,12 +31,10 @@ module RecordingStudioIcons
       registry.configuration
     end
 
-    def configure
+    def configure(&)
       return configuration unless block_given?
 
-      registry.configure do |config|
-        yield(config)
-      end
+      registry.configure(&)
     end
 
     def reset_configuration!
@@ -76,8 +73,8 @@ module RecordingStudioIcons
       registry.resolve_icon_details(recordable_or_type)
     end
 
-    def render_icon(view_context, recordable_or_type, **options)
-      registry.render_icon(view_context, recordable_or_type, **options)
+    def render_icon(view_context, recordable_or_type, **)
+      registry.render_icon(view_context, recordable_or_type, **)
     end
 
     def normalize_icon_reference(icon_reference)

@@ -9,6 +9,8 @@ class HooksTest < Minitest::Test
     end
   end
 
+  NonCallableHandler = Class.new
+
   def setup
     @hooks = RecordingStudioIcons::Hooks.new
   end
@@ -38,23 +40,14 @@ class HooksTest < Minitest::Test
     assert_equal [1, 2, 3], order
   end
 
-  def test_around_hook_wraps_execution
-    events = []
+  def test_on_configuration_registration
+    called = false
 
-    @hooks.around_service do |_service, block|
-      events << :before
-      result = block.call
-      events << :after
-      result
-    end
+    @hooks.on_configuration { called = true }
 
-    result = @hooks.run_around(:around_service, "service") do
-      events << :inside
-      "result"
-    end
-
-    assert_equal %i[before inside after], events
-    assert_equal "result", result
+    assert @hooks.registered?(:on_configuration)
+    @hooks.run(:on_configuration)
+    assert called
   end
 
   def test_raise_on_error_raises_hook_error
@@ -66,31 +59,31 @@ class HooksTest < Minitest::Test
     end
   end
 
-  def test_class_trigger_is_alias_for_run
+  def test_class_run_dispatches_custom_events
     called = false
     RecordingStudioIcons.configuration.hooks.on(:custom_event) { called = true }
 
-    RecordingStudioIcons::Hooks.trigger(:custom_event)
+    RecordingStudioIcons::Hooks.run(:custom_event)
 
     assert called
   ensure
     RecordingStudioIcons.configuration.hooks.clear!
   end
 
-  def test_extend_model_and_controller_store_registered_blocks
-    model_extension = proc { :model_extension }
-    controller_extension = proc { :controller_extension }
+  def test_custom_event_registration
+    seen_values = []
 
-    @hooks.extend_model(:workspace, &model_extension)
-    @hooks.extend_controller("pages", &controller_extension)
+    @hooks.on(:custom_event) { |value| seen_values << value }
 
-    assert_equal [model_extension], @hooks.model_extensions_for("workspace")
-    assert_equal [controller_extension], @hooks.controller_extensions_for(:pages)
+    @hooks.run(:custom_event, "value")
+
+    assert_equal ["value"], seen_values
   end
 
-  def test_unknown_extensions_return_empty_lists
-    assert_equal [], @hooks.model_extensions_for(:missing_model)
-    assert_equal [], @hooks.controller_extensions_for(:missing_controller)
+  def test_registration_without_handler_or_block_is_a_noop
+    @hooks.on(:custom_event)
+
+    refute @hooks.registered?(:custom_event)
   end
 
   def test_clear_removes_only_the_requested_event
@@ -105,12 +98,6 @@ class HooksTest < Minitest::Test
 
   def test_run_returns_empty_array_when_no_hooks_are_registered
     assert_equal [], @hooks.run(:missing_event)
-  end
-
-  def test_run_around_without_hooks_yields_directly
-    result = @hooks.run_around(:missing_around, :context) { "direct result" }
-
-    assert_equal "direct result", result
   end
 
   def test_hook_errors_are_swallowed_when_raise_on_error_is_false
@@ -132,14 +119,28 @@ class HooksTest < Minitest::Test
       assert_equal [], @hooks.run(:after_initialize)
     end
 
-    assert logger.messages.any? { |message| message.include?("soft failure") }
+    assert(logger.messages.any? { |message| message.include?("soft failure") })
   end
 
   def test_handler_objects_that_only_define_to_proc_are_supported
-    handler = ToProcOnlyHandler.new(proc { |value| value.upcase })
+    handler = ToProcOnlyHandler.new(proc(&:upcase))
 
     @hooks.on(:custom_event, handler)
 
     assert_equal ["VALUE"], @hooks.run(:custom_event, "value")
+  end
+
+  def test_non_callable_handler_objects_return_nil_results
+    @hooks.on(:custom_event, NonCallableHandler.new)
+
+    assert_equal [nil], @hooks.run(:custom_event, "value")
+  end
+
+  def test_hook_errors_are_swallowed_when_logger_is_unavailable
+    @hooks.after_initialize { raise "soft failure" }
+
+    Rails.stub(:logger, nil) do
+      assert_equal [], @hooks.run(:after_initialize)
+    end
   end
 end

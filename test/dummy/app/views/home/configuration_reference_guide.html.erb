@@ -8,15 +8,31 @@
   <section class="space-y-4">
     <%= render FlatPack::SectionTitle::Component.new(
       title: "Default library",
-      subtitle: "Use config/recording_studio_icons.yml to choose the library and variant for string and symbol icon references.",
+      subtitle: "Use a Rails initializer to choose the library and variant for string and symbol icon references.",
       anchor_link: true,
       anchor_id: "load-sources"
     ) %>
 
     <%= render FlatPack::CodeBlock::Component.new(
-      title: "config/recording_studio_icons.yml",
+      title: "config/initializers/recording_studio_icons.rb",
       code: @configuration_flags_example,
-      language: "yaml",
+      language: "ruby",
+      separated: false
+    ) %>
+  </section>
+
+  <section class="space-y-4">
+    <%= render FlatPack::SectionTitle::Component.new(
+      title: "Fallback icon",
+      subtitle: "Use this to show one global icon when a type has no override or default icon mapping.",
+      anchor_link: true,
+      anchor_id: "fallback-icon"
+    ) %>
+
+    <%= render FlatPack::CodeBlock::Component.new(
+      title: "Fallback example",
+      code: @configuration_fallback_example,
+      language: "ruby",
       separated: false
     ) %>
   </section>
@@ -32,6 +48,22 @@
     <%= render FlatPack::CodeBlock::Component.new(
       title: "Override examples",
       snippets: @configuration_override_examples,
+      separated: false
+    ) %>
+  </section>
+
+  <section class="space-y-4">
+    <%= render FlatPack::SectionTitle::Component.new(
+      title: "Unknown icon library",
+      subtitle: "Use this flag to raise when an icon resolves successfully but its library has no registered renderer.",
+      anchor_link: true,
+      anchor_id: "unknown-icon-library"
+    ) %>
+
+    <%= render FlatPack::CodeBlock::Component.new(
+      title: "Strict library example",
+      code: @configuration_unknown_library_example,
+      language: "ruby",
       separated: false
     ) %>
   </section>
