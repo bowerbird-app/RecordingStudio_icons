@@ -18,7 +18,7 @@
     <link rel="icon" href="/icon.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" href="/icon.png">
 
-    <%# Load app styles, FlatPack token styles, and utility classes %>
+    <%# Load app styles, FlatPack variables, and utility classes %>
     <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
     <%= stylesheet_link_tag "flat_pack/variables", "data-turbo-track": "reload" %>
     <%= stylesheet_link_tag "flat_pack/application", "data-turbo-track": "reload" %>
@@ -30,7 +30,23 @@
     <%= render "layouts/icon_sprite" %>
 
     <main class="container mx-auto mt-28 px-5 flex">
-      <%= yield %>
+      <div class="w-full space-y-4">
+        <% flash.each do |type, message| %>
+          <% next if message.blank? %>
+          <% style = case type.to_s
+                     when "notice" then :success
+                     when "alert" then :danger
+                     else :info
+                     end %>
+          <%= render FlatPack::Alert::Component.new(
+            title: type.to_s.titleize,
+            description: message,
+            style: style
+          ) %>
+        <% end %>
+
+        <%= yield %>
+      </div>
     </main>
   </body>
 </html>

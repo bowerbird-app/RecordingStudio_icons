@@ -1,7 +1,31 @@
 development:
   default_library: heroicons
-  icon_token_map:
-    document:
+  default_icons:
+    Workspace:
+      library: heroicons
+      name: document-text
+      variant: outline
+  fallback_icon:
+    library: heroicons
+    name: rectangle-stack
+    variant: outline
+
+test:
+  default_library: heroicons
+  default_icons:
+    Workspace:
+      library: heroicons
+      name: document-text
+      variant: outline
+  fallback_icon:
+    library: heroicons
+    name: rectangle-stack
+    variant: outline
+
+production:
+  default_library: heroicons
+  default_icons:
+    Workspace:
       library: heroicons
       name: document-text
       variant: outline

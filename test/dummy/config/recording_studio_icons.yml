@@ -1,0 +1,47 @@
+development:
+  default_library: heroicons
+  default_icons:
+    Workspace:
+      library: heroicons
+      name: rectangle-stack
+      variant: outline
+    Folder:
+      library: heroicons
+      name: folder
+      variant: outline
+    Page:
+      library: heroicons
+      name: document-duplicate
+      variant: outline
+
+test:
+  default_library: heroicons
+  default_icons:
+    Workspace:
+      library: heroicons
+      name: rectangle-stack
+      variant: outline
+    Folder:
+      library: heroicons
+      name: folder
+      variant: outline
+    Page:
+      library: heroicons
+      name: document-duplicate
+      variant: outline
+
+production:
+  default_library: heroicons
+  default_icons:
+    Workspace:
+      library: heroicons
+      name: rectangle-stack
+      variant: outline
+    Folder:
+      library: heroicons
+      name: folder
+      variant: outline
+    Page:
+      library: heroicons
+      name: document-duplicate
+      variant: outline

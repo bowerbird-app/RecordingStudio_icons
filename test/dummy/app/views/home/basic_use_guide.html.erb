@@ -1,0 +1,14 @@
+<div class="space-y-10">
+  <%= render FlatPack::PageTitle::Component.new(
+    title: "Use icon",
+    subtitle: "Render an icon with the view helper for any registered object or type.",
+    variant: :h1
+  ) %>
+
+  <%= render FlatPack::CodeBlock::Component.new(
+    title: "View usage",
+    code: @basic_use_example,
+    language: "erb",
+    separated: false
+  ) %>
+</div>

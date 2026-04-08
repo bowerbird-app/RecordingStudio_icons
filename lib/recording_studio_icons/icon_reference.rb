@@ -4,15 +4,15 @@ module RecordingStudioIcons
   class IconReference
     attr_reader :library, :name, :variant, :options
 
-    def self.normalize(value, default_library: nil)
+    def self.normalize(value, default_library: nil, default_variant: nil)
       return if value.nil?
       return value if value.is_a?(self)
 
       case value
       when String
-        new(library: default_library, name: value)
+        new(library: default_library, name: value, variant: default_variant)
       when Symbol
-        new(library: default_library, name: value.to_s.tr("_", "-"))
+        new(library: default_library, name: value.to_s.tr("_", "-"), variant: default_variant)
       when Hash
         symbolized = value.each_with_object({}) { |(key, item), memo| memo[key.to_sym] = item }
         name = symbolized[:name]
@@ -21,7 +21,7 @@ module RecordingStudioIcons
         new(
           library: symbolized[:library] || default_library,
           name: name,
-          variant: symbolized[:variant],
+          variant: symbolized[:variant] || default_variant,
           options: symbolized[:options] || {}
         )
       else

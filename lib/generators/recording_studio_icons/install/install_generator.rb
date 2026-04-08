@@ -11,13 +11,7 @@ module RecordingStudioIcons
         route 'mount RecordingStudioIcons::Engine, at: "/recording_studio_icons"'
       end
 
-      def copy_initializer
-        template "recording_studio_icons_initializer.rb", "config/initializers/recording_studio_icons.rb"
-      end
-
       def add_yaml_config
-        return unless yes?("Would you like to add `config/recording_studio_icons.yml` for environment-specific settings? [y/N]")
-
         template "recording_studio_icons.yml", "config/recording_studio_icons.yml"
       end
 

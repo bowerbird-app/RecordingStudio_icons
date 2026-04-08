@@ -6,69 +6,66 @@ require "recording_studio_icons/type_normalizer"
 require "recording_studio_icons/icon_reference"
 require "recording_studio_icons/resolution_result"
 require "recording_studio_icons/renderer_registry"
+require "recording_studio_icons/registry"
+require "recording_studio_icons/view_helper"
 require "recording_studio_icons/renderers/heroicons"
 require "recording_studio_icons/hooks"
 require "recording_studio_icons/configuration"
+require "recording_studio_icons/config_loader"
 require "recording_studio_icons/engine"
 
 module RecordingStudioIcons
   PRECEDENCE = %i[
     override_icon
-    override_icon_token
     default_icon
-    default_icon_token
     fallback
     none
   ].freeze
 
   class << self
+    def registry
+      @registry_mutex ||= Mutex.new
+      @registry ||= @registry_mutex.synchronize { @registry ||= Registry.new }
+    end
+
     def configuration
-      @configuration ||= Configuration.new
+      registry.configuration
     end
 
     def configure
-      yield(configuration) if block_given?
+      return configuration unless block_given?
+
+      registry.configure do |config|
+        yield(config)
+      end
     end
 
     def reset_configuration!
-      @configuration = Configuration.new
+      registry.reset_configuration!
     end
 
     def renderer_registry
-      @renderer_registry ||= RendererRegistry.new
+      registry.renderer_registry
     end
 
     def reset_renderers!
-      @renderer_registry = RendererRegistry.new
-      register_renderer(:heroicons, Renderers::Heroicons)
+      registry.reset_renderers!
     end
 
     def register_default_icon(type, icon_reference)
-      configuration.default_icon(type, icon_reference)
+      registry.register_default_icon(type, icon_reference)
     end
 
     def register_override_icon(type, icon_reference)
-      configuration.override_icon(type, icon_reference)
-    end
-
-    def register_default_icon_token(type, token)
-      configuration.default_icon_token(type, token)
-    end
-
-    def register_override_icon_token(type, token)
-      configuration.override_icon_token(type, token)
-    end
-
-    def map_icon_token(token, icon_reference)
-      configuration.map_icon_token(token, icon_reference)
+      registry.register_override_icon(type, icon_reference)
     end
 
     def register_renderer(library, renderer)
-      renderer_registry.register(library, renderer)
+      registry.register_renderer(library, renderer)
     end
 
     def resolve_icon(recordable_or_type)
-      resolve_icon_details(recordable_or_type).icon
+      registry.resolve_icon(recordable_or_type)
     end
 
     def icon_for_type(type)
@@ -76,62 +73,21 @@ module RecordingStudioIcons
     end
 
     def resolve_icon_details(recordable_or_type)
-      type_name = normalize_type(recordable_or_type)
-
-      icon = configuration.override_icons[type_name]
-      return ResolutionResult.new(type_name: type_name, icon: icon, source: :override_icon) if icon
-
-      token = configuration.override_icon_tokens[type_name]
-      mapped = resolve_token(token)
-      return ResolutionResult.new(type_name: type_name, icon: mapped, source: :override_icon_token, token: token) if token && mapped
-
-      icon = configuration.default_icons[type_name]
-      return ResolutionResult.new(type_name: type_name, icon: icon, source: :default_icon) if icon
-
-      token = configuration.default_icon_tokens[type_name]
-      mapped = resolve_token(token)
-      return ResolutionResult.new(type_name: type_name, icon: mapped, source: :default_icon_token, token: token) if token && mapped
-
-      return ResolutionResult.new(type_name: type_name, icon: configuration.fallback_icon, source: :fallback) if configuration.fallback_icon
-
-      ResolutionResult.new(type_name: type_name, icon: nil, source: :none)
+      registry.resolve_icon_details(recordable_or_type)
     end
 
     def render_icon(view_context, recordable_or_type, **options)
-      icon_reference = resolve_icon(recordable_or_type)
-      return nil unless icon_reference
-
-      renderer = renderer_registry.fetch(icon_reference.library)
-      if renderer.nil?
-        raise MissingRendererError, "No renderer registered for #{icon_reference.library.inspect}" if configuration.raise_on_missing_renderer
-
-        return nil
-      end
-
-      renderer.render(view_context, icon_reference, **options)
+      registry.render_icon(view_context, recordable_or_type, **options)
     end
 
     def normalize_icon_reference(icon_reference)
-      IconReference.normalize(icon_reference, default_library: configuration.default_library)
+      registry.normalize_icon_reference(icon_reference)
     end
 
     def normalize_type(recordable_or_type)
-      TypeNormalizer.call(recordable_or_type)
-    end
-
-    private
-
-    def resolve_token(token)
-      return if token.nil?
-
-      mapped = configuration.icon_token_map[token.to_sym]
-      if mapped.nil? && configuration.raise_on_missing_token_mapping
-        raise MissingTokenMappingError, "No icon mapping registered for token #{token.inspect}"
-      end
-
-      mapped
+      registry.normalize_type(recordable_or_type)
     end
   end
 
-  reset_renderers!
+  registry
 end

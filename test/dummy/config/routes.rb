@@ -18,4 +18,7 @@ Rails.application.routes.draw do
 
   # Defines the root path route ("/")
   root "home#index"
+  get "guides/basic-use", to: "home#basic_use_guide", as: :basic_use_guide
+  get "guides/set-icon", to: "home#set_icon_guide", as: :set_icon_guide
+  get "guides/configuration-reference", to: "home#configuration_reference_guide", as: :configuration_reference_guide
 end

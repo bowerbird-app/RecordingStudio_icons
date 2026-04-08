@@ -10,10 +10,28 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_02_17_233016) do
+ActiveRecord::Schema[8.1].define(version: 2026_04_08_000001) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
+
+  create_table "folders", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "name", null: false
+    t.datetime "updated_at", null: false
+    t.uuid "workspace_id", null: false
+    t.index ["workspace_id"], name: "index_folders_on_workspace_id"
+  end
+
+  create_table "pages", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.uuid "folder_id"
+    t.string "title", null: false
+    t.datetime "updated_at", null: false
+    t.uuid "workspace_id", null: false
+    t.index ["folder_id"], name: "index_pages_on_folder_id"
+    t.index ["workspace_id"], name: "index_pages_on_workspace_id"
+  end
 
   create_table "recording_studio_access_boundaries", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.datetime "created_at", null: false
@@ -96,6 +114,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_17_233016) do
     t.datetime "updated_at", null: false
   end
 
+  add_foreign_key "folders", "workspaces"
+  add_foreign_key "pages", "folders"
+  add_foreign_key "pages", "workspaces"
   add_foreign_key "recording_studio_device_sessions", "recording_studio_recordings", column: "root_recording_id"
   add_foreign_key "recording_studio_events", "recording_studio_recordings", column: "recording_id"
   add_foreign_key "recording_studio_recordings", "recording_studio_recordings", column: "parent_recording_id"

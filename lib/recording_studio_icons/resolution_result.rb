@@ -2,13 +2,12 @@
 
 module RecordingStudioIcons
   class ResolutionResult
-    attr_reader :type_name, :icon, :source, :token
+    attr_reader :type_name, :icon, :source
 
-    def initialize(type_name:, icon:, source:, token: nil)
+    def initialize(type_name:, icon:, source:)
       @type_name = type_name
       @icon = icon
       @source = source
-      @token = token&.to_sym
     end
 
     def fallback?

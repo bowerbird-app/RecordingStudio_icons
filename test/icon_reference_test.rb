@@ -10,10 +10,29 @@ class IconReferenceTest < Minitest::Test
     assert_equal "document-text", icon.name
   end
 
+  def test_string_normalization_uses_default_variant
+    icon = RecordingStudioIcons::IconReference.normalize(
+      "document-text",
+      default_library: :heroicons,
+      default_variant: :solid
+    )
+
+    assert_equal :solid, icon.variant
+  end
+
   def test_symbol_normalization_converts_underscores_to_hyphens
     icon = RecordingStudioIcons::IconReference.normalize(:document_text, default_library: :heroicons)
 
     assert_equal "document-text", icon.name
+  end
+
+  def test_hash_normalization_uses_default_variant_when_missing
+    icon = RecordingStudioIcons::IconReference.normalize(
+      { library: :custom, name: :app_document },
+      default_variant: :filled
+    )
+
+    assert_equal :filled, icon.variant
   end
 
   def test_hash_normalization_preserves_variant_and_options

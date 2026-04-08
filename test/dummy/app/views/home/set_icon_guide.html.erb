@@ -1,0 +1,13 @@
+<div class="space-y-10">
+  <%= render FlatPack::PageTitle::Component.new(
+    title: "Set icon",
+    subtitle: "Register the icon a class should use.",
+    variant: :h1
+  ) %>
+
+  <%= render FlatPack::CodeBlock::Component.new(
+    title: "Model/class example",
+    snippets: @set_icon_examples,
+    separated: false
+  ) %>
+</div>

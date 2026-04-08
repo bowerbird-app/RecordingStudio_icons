@@ -4,8 +4,7 @@ This dummy app demonstrates `recording_studio_icons` end-to-end with the real pu
 
 ## What the demo shows
 
-- addon-style default icon tokens and default icon references
-- host app token mapping through `icon_token_map`
+- addon-style default icon references
 - explicit host overrides that beat addon defaults
 - fallback icon behavior
 - renderer dispatch across multiple libraries (`:heroicons` and a dummy `:custom` renderer)

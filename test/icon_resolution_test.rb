@@ -9,12 +9,12 @@ class IconResolutionTest < Minitest::Test
   UnknownType = Class.new
 
   def setup
-    @original_configuration = RecordingStudioIcons.instance_variable_get(:@configuration)
-    RecordingStudioIcons.instance_variable_set(:@configuration, RecordingStudioIcons::Configuration.new)
+    @original_registry = RecordingStudioIcons.instance_variable_get(:@registry)
+    RecordingStudioIcons.instance_variable_set(:@registry, RecordingStudioIcons::Registry.new)
   end
 
   def teardown
-    RecordingStudioIcons.instance_variable_set(:@configuration, @original_configuration)
+    RecordingStudioIcons.instance_variable_set(:@registry, @original_registry)
   end
 
   def test_type_normalization_for_class_string_and_instance
@@ -28,18 +28,16 @@ class IconResolutionTest < Minitest::Test
     assert_equal from_class, from_instance
   end
 
-  def test_default_icon_token_registration_and_mapping
-    RecordingStudioIcons.register_default_icon_token(DocumentType, :document)
-    RecordingStudioIcons.map_icon_token(:document, { library: :heroicons, name: "document-text", variant: :outline })
+  def test_default_icon_registration
+    RecordingStudioIcons.register_default_icon(DocumentType, { library: :heroicons, name: "document-text", variant: :outline })
 
     result = RecordingStudioIcons.resolve_icon_details(DocumentType)
 
-    assert_equal :default_icon_token, result.source
-    assert_equal :document, result.token
+    assert_equal :default_icon, result.source
     assert_equal :heroicons, result.icon.library
   end
 
-  def test_default_icon_registration
+  def test_default_icon_registration_for_another_type
     RecordingStudioIcons.register_default_icon(CommentType, { library: :custom, name: "comment" })
 
     result = RecordingStudioIcons.resolve_icon_details(CommentType)
@@ -48,20 +46,18 @@ class IconResolutionTest < Minitest::Test
     assert_equal "comment", result.icon.name
   end
 
-  def test_override_token_takes_precedence_over_addon_defaults
+  def test_override_icon_takes_precedence_over_default_icon
     RecordingStudioIcons.register_default_icon(CommentType, { library: :custom, name: "comment-default" })
-    RecordingStudioIcons.map_icon_token(:document, { library: :heroicons, name: "document-text", variant: :outline })
-    RecordingStudioIcons.register_override_icon_token(CommentType, :document)
+    RecordingStudioIcons.register_override_icon(CommentType, { library: :heroicons, name: "comment-override", variant: :solid })
 
     result = RecordingStudioIcons.resolve_icon_details(CommentType)
 
-    assert_equal :override_icon_token, result.source
-    assert_equal "document-text", result.icon.name
+    assert_equal :override_icon, result.source
+    assert_equal "comment-override", result.icon.name
   end
 
-  def test_override_icon_takes_precedence_over_token_based_defaults
-    RecordingStudioIcons.register_default_icon_token(AudioType, :document)
-    RecordingStudioIcons.map_icon_token(:document, { library: :heroicons, name: "document-text", variant: :outline })
+  def test_override_icon_takes_precedence_over_default_icons
+    RecordingStudioIcons.register_default_icon(AudioType, { library: :heroicons, name: "speaker-wave", variant: :outline })
     RecordingStudioIcons.register_override_icon(AudioType, { library: :custom, name: "audio-override" })
 
     result = RecordingStudioIcons.resolve_icon_details(AudioType)
@@ -79,22 +75,10 @@ class IconResolutionTest < Minitest::Test
     assert_equal "fallback", result.icon.name
   end
 
-  def test_missing_token_mapping_returns_fallback_when_not_strict
-    RecordingStudioIcons.register_default_icon_token(DocumentType, :missing_document)
-    RecordingStudioIcons.configuration.fallback_icon = { library: :custom, name: "fallback" }
-
+  def test_returns_none_when_no_icon_or_fallback_is_registered
     result = RecordingStudioIcons.resolve_icon_details(DocumentType)
 
-    assert_equal :fallback, result.source
-    assert_equal "fallback", result.icon.name
-  end
-
-  def test_missing_token_mapping_raises_when_strict
-    RecordingStudioIcons.register_default_icon_token(DocumentType, :missing_document)
-    RecordingStudioIcons.configuration.raise_on_missing_token_mapping = true
-
-    assert_raises(RecordingStudioIcons::MissingTokenMappingError) do
-      RecordingStudioIcons.resolve_icon(DocumentType)
-    end
+    assert_equal :none, result.source
+    assert_nil result.icon
   end
 end

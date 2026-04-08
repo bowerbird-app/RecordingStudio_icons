@@ -21,13 +21,14 @@ module RecordingStudioIcons
 
     # Default priority for hooks (lower runs first)
     DEFAULT_PRIORITY = 100
+    EMPTY_LIST = [].freeze
 
     attr_accessor :raise_on_error
 
     def initialize
-      @registry = Hash.new { |h, k| h[k] = [] }
-      @model_extensions = Hash.new { |h, k| h[k] = [] }
-      @controller_extensions = Hash.new { |h, k| h[k] = [] }
+      @registry = {}.freeze
+      @model_extensions = {}.freeze
+      @controller_extensions = {}.freeze
       @raise_on_error = false
       @mutex = Mutex.new
     end
@@ -103,9 +104,7 @@ module RecordingStudioIcons
     def extend_model(model_name, &block)
       return unless block_given?
 
-      @mutex.synchronize do
-        @model_extensions[model_name.to_sym] << block
-      end
+      append_extension(:@model_extensions, model_name, block)
     end
 
     # Register a controller extension
@@ -115,9 +114,7 @@ module RecordingStudioIcons
     def extend_controller(controller_name, &block)
       return unless block_given?
 
-      @mutex.synchronize do
-        @controller_extensions[controller_name.to_sym] << block
-      end
+      append_extension(:@controller_extensions, controller_name, block)
     end
 
     # Get model extensions for a given model
@@ -125,7 +122,7 @@ module RecordingStudioIcons
     # @param model_name [Symbol, String] The model name
     # @return [Array<Proc>] Array of extension blocks
     def model_extensions_for(model_name)
-      @model_extensions[model_name.to_sym]
+      @model_extensions.fetch(model_name.to_sym, EMPTY_LIST)
     end
 
     # Get controller extensions for a given controller
@@ -133,7 +130,7 @@ module RecordingStudioIcons
     # @param controller_name [Symbol, String] The controller name
     # @return [Array<Proc>] Array of extension blocks
     def controller_extensions_for(controller_name)
-      @controller_extensions[controller_name.to_sym]
+      @controller_extensions.fetch(controller_name.to_sym, EMPTY_LIST)
     end
 
     # Run all hooks for a given event
@@ -142,7 +139,7 @@ module RecordingStudioIcons
     # @param args [Array] Arguments to pass to hooks
     # @return [Array] Results from all hooks
     def run(event_name, *args)
-      hooks = @registry[event_name].sort_by { |h| h[:priority] }
+      hooks = @registry.fetch(event_name, EMPTY_LIST).sort_by { |h| h[:priority] }
       results = []
 
       hooks.each do |hook|
@@ -162,7 +159,7 @@ module RecordingStudioIcons
     # @yield The block to wrap
     # @return [Object] Result of the wrapped block
     def run_around(event_name, context, &block)
-      hooks = @registry[event_name].sort_by { |h| h[:priority] }
+      hooks = @registry.fetch(event_name, EMPTY_LIST).sort_by { |h| h[:priority] }
 
       if hooks.empty?
         yield
@@ -180,15 +177,19 @@ module RecordingStudioIcons
     # @param event_name [Symbol] The event name
     # @return [Boolean] True if hooks exist
     def registered?(event_name)
-      @registry[event_name].any?
+      @registry.fetch(event_name, EMPTY_LIST).any?
+    end
+
+    def counts
+      @registry.transform_values(&:size)
     end
 
     # Clear all hooks (useful for testing)
     def clear!
       @mutex.synchronize do
-        @registry.clear
-        @model_extensions.clear
-        @controller_extensions.clear
+        @registry = {}.freeze
+        @model_extensions = {}.freeze
+        @controller_extensions = {}.freeze
       end
     end
 
@@ -197,7 +198,9 @@ module RecordingStudioIcons
     # @param event_name [Symbol] The event name
     def clear(event_name)
       @mutex.synchronize do
-        @registry.delete(event_name)
+        next_registry = @registry.dup
+        next_registry.delete(event_name)
+        @registry = next_registry.freeze
       end
     end
 
@@ -208,11 +211,13 @@ module RecordingStudioIcons
       return unless callable
 
       @mutex.synchronize do
-        @registry[event_name] << {
+        current_hooks = @registry.fetch(event_name, EMPTY_LIST)
+        next_hooks = current_hooks + [{
           handler: callable,
           priority: priority,
           registered_at: Time.now
-        }
+        }.freeze]
+        @registry = @registry.merge(event_name => next_hooks.freeze).freeze
       end
     end
 
@@ -264,6 +269,17 @@ module RecordingStudioIcons
       # @return [Array] Results from all hooks
       def trigger(event_name, *)
         run(event_name, *)
+      end
+    end
+
+    def append_extension(ivar_name, key, block)
+      normalized_key = key.to_sym
+
+      @mutex.synchronize do
+        store = instance_variable_get(ivar_name)
+        current_extensions = store.fetch(normalized_key, EMPTY_LIST)
+        next_store = store.merge(normalized_key => (current_extensions + [block]).freeze)
+        instance_variable_set(ivar_name, next_store.freeze)
       end
     end
   end

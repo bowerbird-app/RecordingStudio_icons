@@ -3,6 +3,12 @@
 require "test_helper"
 
 class HooksTest < Minitest::Test
+  ToProcOnlyHandler = Struct.new(:callback) do
+    def to_proc
+      callback
+    end
+  end
+
   def setup
     @hooks = RecordingStudioIcons::Hooks.new
   end
@@ -69,5 +75,71 @@ class HooksTest < Minitest::Test
     assert called
   ensure
     RecordingStudioIcons.configuration.hooks.clear!
+  end
+
+  def test_extend_model_and_controller_store_registered_blocks
+    model_extension = proc { :model_extension }
+    controller_extension = proc { :controller_extension }
+
+    @hooks.extend_model(:workspace, &model_extension)
+    @hooks.extend_controller("pages", &controller_extension)
+
+    assert_equal [model_extension], @hooks.model_extensions_for("workspace")
+    assert_equal [controller_extension], @hooks.controller_extensions_for(:pages)
+  end
+
+  def test_unknown_extensions_return_empty_lists
+    assert_equal [], @hooks.model_extensions_for(:missing_model)
+    assert_equal [], @hooks.controller_extensions_for(:missing_controller)
+  end
+
+  def test_clear_removes_only_the_requested_event
+    @hooks.before_initialize { :before }
+    @hooks.after_initialize { :after }
+
+    @hooks.clear(:before_initialize)
+
+    refute @hooks.registered?(:before_initialize)
+    assert @hooks.registered?(:after_initialize)
+  end
+
+  def test_run_returns_empty_array_when_no_hooks_are_registered
+    assert_equal [], @hooks.run(:missing_event)
+  end
+
+  def test_run_around_without_hooks_yields_directly
+    result = @hooks.run_around(:missing_around, :context) { "direct result" }
+
+    assert_equal "direct result", result
+  end
+
+  def test_hook_errors_are_swallowed_when_raise_on_error_is_false
+    logger = Class.new do
+      attr_reader :messages
+
+      def initialize
+        @messages = []
+      end
+
+      def error(message)
+        @messages << message
+      end
+    end.new
+
+    @hooks.after_initialize { raise "soft failure" }
+
+    Rails.stub(:logger, logger) do
+      assert_equal [], @hooks.run(:after_initialize)
+    end
+
+    assert logger.messages.any? { |message| message.include?("soft failure") }
+  end
+
+  def test_handler_objects_that_only_define_to_proc_are_supported
+    handler = ToProcOnlyHandler.new(proc { |value| value.upcase })
+
+    @hooks.on(:custom_event, handler)
+
+    assert_equal ["VALUE"], @hooks.run(:custom_event, "value")
   end
 end

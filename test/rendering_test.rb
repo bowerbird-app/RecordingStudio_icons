@@ -18,15 +18,18 @@ class RenderingTest < Minitest::Test
   end
 
   def setup
-    @original_configuration = RecordingStudioIcons.instance_variable_get(:@configuration)
-    @original_registry = RecordingStudioIcons.instance_variable_get(:@renderer_registry)
-    RecordingStudioIcons.instance_variable_set(:@configuration, RecordingStudioIcons::Configuration.new)
-    RecordingStudioIcons.instance_variable_set(:@renderer_registry, RecordingStudioIcons::RendererRegistry.new)
+    @original_registry = RecordingStudioIcons.instance_variable_get(:@registry)
+    RecordingStudioIcons.instance_variable_set(
+      :@registry,
+      RecordingStudioIcons::Registry.new(
+        configuration: RecordingStudioIcons::Configuration.new,
+        renderer_registry: RecordingStudioIcons::RendererRegistry.new
+      )
+    )
   end
 
   def teardown
-    RecordingStudioIcons.instance_variable_set(:@configuration, @original_configuration)
-    RecordingStudioIcons.instance_variable_set(:@renderer_registry, @original_registry)
+    RecordingStudioIcons.instance_variable_set(:@registry, @original_registry)
   end
 
   def test_rendering_dispatches_by_library
@@ -38,6 +41,16 @@ class RenderingTest < Minitest::Test
     assert_equal "rendered", result
     assert_equal :custom, StubRenderer.last_icon.library
     assert_equal({ class: "h-5 w-5" }, StubRenderer.last_options)
+  end
+
+  def test_view_helper_delegates_rendering_with_current_view_context
+    RecordingStudioIcons.register_default_icon(RenderType, :folder)
+
+    view_context = Object.new.extend(RecordingStudioIcons::ViewHelper)
+    result = view_context.render_recording_studio_icon(RenderType, class: "h-5 w-5")
+
+    assert_includes result, "<svg"
+    assert_includes result, "data-icon-name=\"folder\""
   end
 
   def test_missing_renderer_returns_nil_when_not_strict
@@ -53,5 +66,31 @@ class RenderingTest < Minitest::Test
     assert_raises(RecordingStudioIcons::MissingRendererError) do
       RecordingStudioIcons.render_icon(Object.new, RenderType)
     end
+  end
+
+  def test_heroicons_renderer_returns_svg_markup_for_known_icons
+    icon = RecordingStudioIcons::IconReference.new(library: :heroicons, name: "folder", variant: :outline)
+
+    result = RecordingStudioIcons::Renderers::Heroicons.render(ActionController::Base.helpers, icon, class: "h-5 w-5")
+
+    assert_includes result, "<svg"
+    assert_includes result, "recording-studio-icons__svg"
+    assert_includes result, "data-icon-name=\"folder\""
+    assert_includes result, "<path"
+  end
+
+  def test_heroicons_renderer_falls_back_to_action_controller_helpers
+    icon = RecordingStudioIcons::IconReference.new(library: :heroicons, name: "document-text", variant: :outline)
+
+    result = RecordingStudioIcons::Renderers::Heroicons.render(Object.new, icon)
+
+    assert_includes result, "data-icon-library=\"heroicons\""
+    assert_includes result, "document-text"
+  end
+
+  def test_heroicons_renderer_returns_nil_for_unknown_icons
+    icon = RecordingStudioIcons::IconReference.new(library: :heroicons, name: "missing-icon", variant: :outline)
+
+    assert_nil RecordingStudioIcons::Renderers::Heroicons.render(ActionController::Base.helpers, icon)
   end
 end

@@ -3,13 +3,13 @@
 module RecordingStudioIcons
   class RendererRegistry
     def initialize
-      @renderers = {}
+      @renderers = {}.freeze
       @mutex = Mutex.new
     end
 
     def register(library, renderer)
       @mutex.synchronize do
-        @renderers[library.to_sym] = renderer
+        @renderers = @renderers.merge(library.to_sym => renderer).freeze
       end
     end
 
@@ -18,12 +18,12 @@ module RecordingStudioIcons
     end
 
     def to_h
-      @renderers.dup
+      @renderers.dup.freeze
     end
 
     def clear!
       @mutex.synchronize do
-        @renderers.clear
+        @renderers = {}.freeze
       end
     end
   end
