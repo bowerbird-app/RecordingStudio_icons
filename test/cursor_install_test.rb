@@ -26,8 +26,8 @@ class CursorInstallTest < Minitest::Test
     assert File.executable?(fetch)
 
     commands = env.fetch("terminals").map { |terminal| terminal.fetch("command") }
-    assert commands.any? { |command| command.include?("test/dummy") && command.include?("rails server") }
-    assert commands.any? { |command| command.include?("test/dummy") && command.include?("tailwindcss:watch") }
+    assert(commands.any? { |command| command.include?("test/dummy") && command.include?("rails server") })
+    assert(commands.any? { |command| command.include?("test/dummy") && command.include?("tailwindcss:watch") })
   end
 
   def test_start_sh_only_starts_postgres
