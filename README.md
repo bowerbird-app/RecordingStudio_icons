@@ -329,6 +329,15 @@ Then sign in at `http://localhost:3000` with:
 The dummy app root path contains the richer registry demo and guide pages. The mounted engine
 home page is also available at `http://localhost:3000/recording_studio_icons`.
 
+## Cloud Agent boot
+
+Cloud Agent Builds run `.cursor/install.sh`, then `.cursor/fetch-skills.sh`.
+The install hook provisions a cold image. On a warm snapshot it skips apt,
+ruby-build, db:prepare, and tailwind when Ruby, bundle, and Postgres are
+already usable. Fetch-skills always runs last. `.cursor/start.sh` starts
+PostgreSQL on each boot. Rebuild with Draft off to load a new pack. See
+[Cursor skills in Cloud Agents](docs/cursor-skills.md).
+
 ## Archival template docs
 
 The files under `docs/gem_template/` are preserved template documentation from the source gem
