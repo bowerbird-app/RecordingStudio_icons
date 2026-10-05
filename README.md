@@ -329,13 +329,16 @@ Then sign in at `http://localhost:3000` with:
 The dummy app root path contains the richer registry demo and guide pages. The mounted engine
 home page is also available at `http://localhost:3000/recording_studio_icons`.
 
+Dummy credentials (`test/dummy/config/credentials.yml.enc`) are encrypted with the shared RecordingStudio_* development master key. Set `RAILS_MASTER_KEY` or put that key in `test/dummy/config/master.key` (gitignored). Keep the encrypted file; do not generate a per-repo dummy key.
+
 ## Cloud Agent boot
 
 Cloud Agent Builds run `.cursor/install.sh`, then `.cursor/fetch-skills.sh`.
-The install hook provisions a cold image. On a warm snapshot it skips apt,
-ruby-build, db:prepare, and tailwind when Ruby, bundle, and Postgres are
-already usable. Fetch-skills always runs last. `.cursor/start.sh` starts
-PostgreSQL on each boot. Rebuild with Draft off to load a new pack. See
+The install hook provisions a cold image. If `RAILS_MASTER_KEY` is set,
+`.cursor/install.sh` writes gitignored `test/dummy/config/master.key`. On a warm
+snapshot it skips apt, ruby-build, db:prepare, and tailwind when Ruby, bundle,
+and Postgres are already usable. Fetch-skills always runs last. `.cursor/start.sh`
+starts PostgreSQL on each boot. Rebuild with Draft off to load a new pack. See
 [Cursor skills in Cloud Agents](docs/cursor-skills.md).
 
 ## Archival template docs
