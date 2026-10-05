@@ -7,10 +7,11 @@ The repository tracks four boot files:
 
 - `.cursor/environment.json` defines the Build hooks, terminals, and port.
 - `.cursor/install.sh` provisions Ruby, PostgreSQL, dependencies, the dummy
-  database, and CSS on a cold image. On a warm snapshot it skips that
-  provision when Ruby, bundle, and Postgres are already usable. A skippable
-  provision failure does not fail the Build. It always runs
-  `.cursor/fetch-skills.sh` last.
+  database, and CSS on a cold image. If `RAILS_MASTER_KEY` is set, it writes
+  gitignored `test/dummy/config/master.key` so dummy credentials decrypt. On a
+  warm snapshot it skips that provision when Ruby, bundle, and Postgres are
+  already usable. A skippable provision failure does not fail the Build. It
+  always runs `.cursor/fetch-skills.sh` last.
 - `.cursor/fetch-skills.sh` downloads the current skill and rule pack.
 - `.cursor/start.sh` starts PostgreSQL on each environment boot.
 
