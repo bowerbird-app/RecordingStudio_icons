@@ -2,6 +2,17 @@
 
 module RecordingStudioIcons
   class IconReference
+    module BlankValue
+      private
+
+      def blank?(value)
+        value.nil? || value.to_s.strip.empty?
+      end
+    end
+
+    extend BlankValue
+    include BlankValue
+
     attr_reader :library, :name, :variant, :options
 
     class << self
@@ -39,10 +50,6 @@ module RecordingStudioIcons
           options: symbolized[:options] || {}
         )
       end
-
-      def blank?(value)
-        value.nil? || value.to_s.strip.empty?
-      end
     end
 
     def initialize(library:, name:, variant: nil, options: {})
@@ -79,10 +86,6 @@ module RecordingStudioIcons
 
     def normalize_name(value)
       value.is_a?(Symbol) ? value.to_s.tr("_", "-") : value.to_s
-    end
-
-    def blank?(value)
-      self.class.send(:blank?, value)
     end
   end
 end

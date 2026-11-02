@@ -4,7 +4,7 @@ require "test_helper"
 
 class RecordingStudioIconsTest < Minitest::Test
   def test_version_exists
-    refute_nil ::RecordingStudioIcons::VERSION
+    assert_equal "0.1.2", ::RecordingStudioIcons::VERSION
   end
 
   def test_engine_exists
@@ -31,5 +31,18 @@ class RecordingStudioIconsTest < Minitest::Test
     assert_includes config_source, '"RecordingStudio::Access" =>'
     refute_includes controller_source, "reset_configuration!"
     refute_includes controller_source, "reset_renderers!"
+  end
+
+  def test_gitignore_covers_root_and_dummy_coverage
+    gitignore = File.read(File.expand_path("../.gitignore", __dir__))
+
+    assert_includes gitignore, "coverage/"
+  end
+
+  def test_dummy_readme_matches_heroicons_demo
+    readme = File.read(File.expand_path("dummy/README.md", __dir__))
+
+    assert_includes readme, ":heroicons"
+    refute_includes readme, "dummy `:custom` renderer"
   end
 end

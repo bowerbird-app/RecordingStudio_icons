@@ -3,6 +3,8 @@
 require "test_helper"
 
 class RenderingTest < Minitest::Test
+  include IsolatedIconRegistry
+
   RenderType = Class.new
 
   class StubRenderer
@@ -15,21 +17,6 @@ class RenderingTest < Minitest::Test
         "rendered"
       end
     end
-  end
-
-  def setup
-    @original_registry = RecordingStudioIcons.instance_variable_get(:@registry)
-    RecordingStudioIcons.instance_variable_set(
-      :@registry,
-      RecordingStudioIcons::Registry.new(
-        configuration: RecordingStudioIcons::Configuration.new,
-        renderer_registry: RecordingStudioIcons::RendererRegistry.new
-      )
-    )
-  end
-
-  def teardown
-    RecordingStudioIcons.instance_variable_set(:@registry, @original_registry)
   end
 
   def test_rendering_dispatches_by_library

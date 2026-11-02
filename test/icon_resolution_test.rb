@@ -3,19 +3,12 @@
 require "test_helper"
 
 class IconResolutionTest < Minitest::Test
+  include IsolatedIconRegistry
+
   DocumentType = Class.new
   CommentType = Class.new
   AudioType = Class.new
   UnknownType = Class.new
-
-  def setup
-    @original_registry = RecordingStudioIcons.instance_variable_get(:@registry)
-    RecordingStudioIcons.instance_variable_set(:@registry, RecordingStudioIcons::Registry.new)
-  end
-
-  def teardown
-    RecordingStudioIcons.instance_variable_set(:@registry, @original_registry)
-  end
 
   def test_type_normalization_for_class_string_and_instance
     RecordingStudioIcons.register_default_icon(DocumentType, { library: :custom, name: "document" })

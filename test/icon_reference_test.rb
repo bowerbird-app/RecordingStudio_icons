@@ -67,4 +67,13 @@ class IconReferenceTest < Minitest::Test
       RecordingStudioIcons::IconReference.normalize("document-text")
     end
   end
+
+  def test_blank_library_and_name_raise
+    assert_raises(RecordingStudioIcons::InvalidIconReferenceError) do
+      RecordingStudioIcons::IconReference.new(library: "  ", name: "folder")
+    end
+    assert_raises(RecordingStudioIcons::InvalidIconReferenceError) do
+      RecordingStudioIcons::IconReference.new(library: :heroicons, name: "")
+    end
+  end
 end

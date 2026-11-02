@@ -3,16 +3,9 @@
 require "test_helper"
 
 class CoreFacadeTest < Minitest::Test
+  include IsolatedIconRegistry
+
   FacadeType = Class.new
-
-  def setup
-    @original_registry = RecordingStudioIcons.instance_variable_get(:@registry)
-    RecordingStudioIcons.instance_variable_set(:@registry, RecordingStudioIcons::Registry.new)
-  end
-
-  def teardown
-    RecordingStudioIcons.instance_variable_set(:@registry, @original_registry)
-  end
 
   def test_configure_with_block_updates_configuration
     result = RecordingStudioIcons.configure do |config|
