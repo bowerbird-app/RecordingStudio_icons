@@ -3,15 +3,9 @@
 require "test_helper"
 
 class CoreFacadeTest < Minitest::Test
+  include IsolatedIconRegistry
+
   FacadeType = Class.new
-
-  def setup
-    RecordingStudioIcons.reset_registry!
-  end
-
-  def teardown
-    RecordingStudioIcons.reset_registry!
-  end
 
   def test_configure_with_block_updates_configuration
     result = RecordingStudioIcons.configure do |config|
@@ -36,17 +30,6 @@ class CoreFacadeTest < Minitest::Test
     RecordingStudioIcons.reset_renderers!
 
     assert_nil RecordingStudioIcons.renderer_registry.fetch(:custom)
-    assert_equal RecordingStudioIcons::Renderers::Heroicons, RecordingStudioIcons.renderer_registry.fetch(:heroicons)
-  end
-
-  def test_reset_registry_replaces_the_singleton_registry
-    RecordingStudioIcons.register_default_icon(FacadeType, :folder)
-    previous_registry = RecordingStudioIcons.registry
-
-    RecordingStudioIcons.reset_registry!
-
-    refute_same previous_registry, RecordingStudioIcons.registry
-    assert_nil RecordingStudioIcons.resolve_icon(FacadeType)
     assert_equal RecordingStudioIcons::Renderers::Heroicons, RecordingStudioIcons.renderer_registry.fetch(:heroicons)
   end
 

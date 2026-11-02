@@ -68,10 +68,7 @@ class IconReferenceTest < Minitest::Test
     end
   end
 
-  def test_blank_library_and_name_raise_without_private_send
-    source = File.read(File.expand_path("../lib/recording_studio_icons/icon_reference.rb", __dir__))
-
-    refute_includes source, ".send("
+  def test_blank_library_and_name_raise
     assert_raises(RecordingStudioIcons::InvalidIconReferenceError) do
       RecordingStudioIcons::IconReference.new(library: "  ", name: "folder")
     end

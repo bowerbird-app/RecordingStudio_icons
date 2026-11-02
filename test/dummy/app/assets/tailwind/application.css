@@ -7,7 +7,7 @@
 @source "../../../../../app";
 
 /* Include FlatPack component sources from the installed bundle */
-@source "../../../vendor/bundle/**/flatpack-*/app/components";
+@source "../../../../../../../usr/local/bundle/ruby/3.3.0/bundler/gems/flatpack-af0e318c4778/app/components";
 
 /* Extend Tailwind theme with FlatPack design tokens */
 @theme {

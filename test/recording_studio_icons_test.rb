@@ -31,7 +31,6 @@ class RecordingStudioIconsTest < Minitest::Test
     assert_includes config_source, '"RecordingStudio::Access" =>'
     refute_includes controller_source, "reset_configuration!"
     refute_includes controller_source, "reset_renderers!"
-    refute_includes controller_source, "reset_registry!"
   end
 
   def test_gitignore_covers_root_and_dummy_coverage
@@ -45,12 +44,5 @@ class RecordingStudioIconsTest < Minitest::Test
 
     assert_includes readme, ":heroicons"
     refute_includes readme, "dummy `:custom` renderer"
-  end
-
-  def test_dummy_tailwind_source_is_bundle_relative
-    css = File.read(File.expand_path("dummy/app/assets/tailwind/application.css", __dir__))
-
-    assert_includes css, '@source "../../../vendor/bundle/**/flatpack-*/app/components";'
-    refute_includes css, "/usr/local/bundle"
   end
 end

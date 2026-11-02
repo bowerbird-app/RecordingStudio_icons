@@ -3,13 +3,7 @@
 require "test_helper"
 
 class EngineTest < Minitest::Test
-  def setup
-    RecordingStudioIcons.reset_registry!
-  end
-
-  def teardown
-    RecordingStudioIcons.reset_registry!
-  end
+  include IsolatedIconRegistry
 
   def test_before_and_after_initialize_initializers_run_hooks
     before_called = false
