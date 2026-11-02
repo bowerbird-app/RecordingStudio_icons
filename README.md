@@ -133,6 +133,9 @@ RecordingStudioIcons.register_default_icon(type, icon_ref)
 RecordingStudioIcons.register_override_icon(type, icon_ref)
 RecordingStudioIcons.register_renderer(library, renderer)
 RecordingStudioIcons.render_icon(view_context, recordable_or_type, **options)
+RecordingStudioIcons.reset_configuration!
+RecordingStudioIcons.reset_renderers!
+RecordingStudioIcons.reset_registry!
 ```
 
 For Rails apps, prefer `Rails.application.config.recording_studio_icons = { ... }` in an initializer.

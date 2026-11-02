@@ -9,12 +9,11 @@ class IconResolutionTest < Minitest::Test
   UnknownType = Class.new
 
   def setup
-    @original_registry = RecordingStudioIcons.instance_variable_get(:@registry)
-    RecordingStudioIcons.instance_variable_set(:@registry, RecordingStudioIcons::Registry.new)
+    RecordingStudioIcons.reset_registry!
   end
 
   def teardown
-    RecordingStudioIcons.instance_variable_set(:@registry, @original_registry)
+    RecordingStudioIcons.reset_registry!
   end
 
   def test_type_normalization_for_class_string_and_instance

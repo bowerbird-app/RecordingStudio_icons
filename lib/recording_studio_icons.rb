@@ -49,6 +49,11 @@ module RecordingStudioIcons
       registry.reset_renderers!
     end
 
+    def reset_registry!
+      @registry_mutex ||= Mutex.new
+      @registry_mutex.synchronize { @registry = Registry.new }
+    end
+
     def register_default_icon(type, icon_reference)
       registry.register_default_icon(type, icon_reference)
     end

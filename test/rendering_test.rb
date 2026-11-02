@@ -18,18 +18,11 @@ class RenderingTest < Minitest::Test
   end
 
   def setup
-    @original_registry = RecordingStudioIcons.instance_variable_get(:@registry)
-    RecordingStudioIcons.instance_variable_set(
-      :@registry,
-      RecordingStudioIcons::Registry.new(
-        configuration: RecordingStudioIcons::Configuration.new,
-        renderer_registry: RecordingStudioIcons::RendererRegistry.new
-      )
-    )
+    RecordingStudioIcons.reset_registry!
   end
 
   def teardown
-    RecordingStudioIcons.instance_variable_set(:@registry, @original_registry)
+    RecordingStudioIcons.reset_registry!
   end
 
   def test_rendering_dispatches_by_library
