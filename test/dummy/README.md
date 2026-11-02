@@ -7,7 +7,7 @@ This dummy app demonstrates `recording_studio_icons` end-to-end with the real pu
 - addon-style default icon references
 - explicit host overrides that beat addon defaults
 - fallback icon behavior
-- renderer dispatch across multiple libraries (`:heroicons` and a dummy `:custom` renderer)
+- renderer dispatch through the built-in `:heroicons` renderer (the demo does not register a `:custom` renderer)
 - FlatPack components for the demo UI (`PageTitle`, `Alert`, `Card`, and `Table`)
 
 ## Run the dummy app
