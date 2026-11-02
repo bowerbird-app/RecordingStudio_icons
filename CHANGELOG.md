@@ -7,10 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.2] - 2026-11-02
+
+Hygiene for the icon registry tests, dummy docs, and coverage artifacts. Icon resolution and rendering behavior are unchanged.
+
+### Added
+- Public `RecordingStudioIcons.reset_registry!` so tests can isolate the singleton registry without reading private instance variables.
+
 ### Changed
-- Updated the README to document the actual `recording_studio_icons:install` generator flow, generated initializer, engine helper integration, and hook lifecycle.
-- Clarified that `docs/gem_template/` is archival template documentation and does not describe the current `RecordingStudioIcons` public API or setup.
-- Replaced stale migration notes with a current repository-status summary.
+- `IconReference` shares one private `blank?` helper for class and instance checks.
+- Dummy README matches the demo (built-in `:heroicons` only).
+- Dummy Tailwind `@source` for FlatPack is bundle-relative (`vendor/bundle/**/flatpack-*`) instead of a hard-coded `/usr/local/bundle` SHA path.
+- Root Gemfile comment names `recording_studio_icons.gemspec`.
+
+### Removed
+- Stopped tracking root and dummy coverage reports. `.gitignore` now covers `coverage/`.
+
+### Upgrade notes
+- Hosts do not need to change. `reset_configuration!` and `reset_renderers!` still reset the current registry. `reset_registry!` replaces that registry with a new one. Tests that poked `@registry` should call `reset_registry!` instead.
 
 ## [0.1.1] - 2026-09-03
 
@@ -40,6 +54,7 @@ renderers, and dummy demo are unchanged.
 - Install generator for host applications and a dummy app demo
 - Basic test suite with Minitest
 
-[Unreleased]: https://github.com/bowerbird-app/recording_studio_icons/compare/v0.1.1...HEAD
+[Unreleased]: https://github.com/bowerbird-app/recording_studio_icons/compare/v0.1.2...HEAD
+[0.1.2]: https://github.com/bowerbird-app/recording_studio_icons/compare/v0.1.1...v0.1.2
 [0.1.1]: https://github.com/bowerbird-app/recording_studio_icons/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/bowerbird-app/recording_studio_icons/releases/tag/v0.1.0
