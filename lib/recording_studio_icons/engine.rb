@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require "recording_studio"
+
 module RecordingStudioIcons
   class Engine < ::Rails::Engine
     isolate_namespace RecordingStudioIcons

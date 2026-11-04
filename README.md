@@ -159,17 +159,35 @@ No superclass fallback is applied.
 - `default_library`
 - `default_variant`
 - `raise_on_missing_renderer`
+- `layout`
 
 For normal host-app setup, use a Rails initializer for host-owned settings:
 
 - `config/initializers/recording_studio_icons.rb`
 
 Register `default_icons` in the owning model, class, or addon code with `register_default_icon`.
-Use the initializer for `override_icons`, `fallback_icon`, `default_library`, `default_variant`, and
-`raise_on_missing_renderer`.
+Use the initializer for `override_icons`, `fallback_icon`, `default_library`, `default_variant`,
+`raise_on_missing_renderer`, and `layout`.
 
 The runtime Ruby API remains available for advanced extensions and tests, but it is not a
 separate automatic load source.
+
+## Engine screens and layout
+
+Engine controllers call `recording_studio_layout`. With `layout` left as `nil`, they use
+`RecordingStudio.configuration.layout`, then `recording_studio/default_layout`. Set `layout` on this
+gem when only these screens should differ. `false` renders with no layout. A String is a layout name.
+A callable must take `controller:` and return a String, `nil`, or `false`.
+
+```ruby
+# config/initializers/recording_studio_icons.rb
+Rails.application.config.recording_studio_icons = {
+  layout: false
+}
+```
+
+The engine home page sets `content_for :title` and `content_for :subtitle`. Do not hard-code
+`layout "recording_studio/default_layout"` on a host controller that renders these screens.
 
 ## Engine integration
 
@@ -194,6 +212,8 @@ end
 ```
 
 ## RecordingStudio integration
+
+This gem depends on `recording_studio` `>= 6.3.0`.
 
 `RecordingStudio` is a natural fit because its recordables already resolve cleanly to class-name
 strings. If you are using the gem with `RecordingStudio`, you can treat each recordable type as a

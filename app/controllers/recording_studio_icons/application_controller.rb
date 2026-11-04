@@ -2,7 +2,10 @@
 
 module RecordingStudioIcons
   class ApplicationController < ActionController::Base
+    include RecordingStudio::ControllerLayout
+
     protect_from_forgery with: :exception
-    layout "application"
+
+    recording_studio_layout { RecordingStudioIcons.configuration.layout }
   end
 end

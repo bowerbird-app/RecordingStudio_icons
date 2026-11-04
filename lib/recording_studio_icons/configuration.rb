@@ -1,11 +1,12 @@
 # frozen_string_literal: true
 
 require_relative "hooks"
+require_relative "configuration/layout"
 
 module RecordingStudioIcons
   module ConfigurationHelpers
     VALID_KEYS = %w[
-      default_icons override_icons fallback_icon default_library default_variant raise_on_missing_renderer
+      default_icons override_icons fallback_icon default_library default_variant raise_on_missing_renderer layout
     ].freeze
 
     module_function
@@ -35,10 +36,13 @@ module RecordingStudioIcons
   end
 
   class Configuration
+    include Layout
+
     MAP_MERGERS = { "default_icons" => :default_icon, "override_icons" => :override_icon }.freeze
     ATTRIBUTE_WRITERS = {
       "fallback_icon" => :fallback_icon=, "default_library" => :default_library=,
-      "default_variant" => :default_variant=, "raise_on_missing_renderer" => :raise_on_missing_renderer=
+      "default_variant" => :default_variant=, "raise_on_missing_renderer" => :raise_on_missing_renderer=,
+      "layout" => :layout=
     }.freeze
 
     attr_reader :hooks, :default_library, :default_variant, :raise_on_missing_renderer, :default_icons,
@@ -51,6 +55,7 @@ module RecordingStudioIcons
       @default_library = :heroicons
       @default_variant = nil
       @raise_on_missing_renderer = false
+      @layout = nil
       @hooks = Hooks.new
       @mutex = Mutex.new
     end
@@ -99,6 +104,7 @@ module RecordingStudioIcons
         default_library: default_library,
         default_variant: default_variant,
         raise_on_missing_renderer: raise_on_missing_renderer,
+        layout: layout,
         hooks_registered: hooks.counts
       }
     end
