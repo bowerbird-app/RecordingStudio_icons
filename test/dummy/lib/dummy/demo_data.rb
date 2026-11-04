@@ -45,13 +45,6 @@ module Dummy
 
       previous_actor = Current.actor
       Current.actor = user
-
-      access = RecordingStudio::Access.find_or_create_by!(actor: user, role: :admin)
-      RecordingStudio::Recording.unscoped.find_or_create_by!(
-        root_recording_id: root_recording.id,
-        parent_recording_id: root_recording.id,
-        recordable: access
-      )
     ensure
       Current.actor = previous_actor
     end
@@ -61,7 +54,6 @@ module Dummy
         Workspace.table_exists? &&
         Folder.table_exists? &&
         Page.table_exists? &&
-        RecordingStudio::Access.table_exists? &&
         RecordingStudio::Recording.table_exists?
     rescue ActiveRecord::NoDatabaseError, ActiveRecord::StatementInvalid
       false

@@ -115,8 +115,12 @@ class HooksTest < Minitest::Test
 
     @hooks.after_initialize { raise "soft failure" }
 
-    Rails.stub(:logger, logger) do
+    original_logger = Rails.logger
+    Rails.logger = logger
+    begin
       assert_equal [], @hooks.run(:after_initialize)
+    ensure
+      Rails.logger = original_logger
     end
 
     assert(logger.messages.any? { |message| message.include?("soft failure") })
@@ -139,8 +143,12 @@ class HooksTest < Minitest::Test
   def test_hook_errors_are_swallowed_when_logger_is_unavailable
     @hooks.after_initialize { raise "soft failure" }
 
-    Rails.stub(:logger, nil) do
+    original_logger = Rails.logger
+    Rails.logger = nil
+    begin
       assert_equal [], @hooks.run(:after_initialize)
+    ensure
+      Rails.logger = original_logger
     end
   end
 end

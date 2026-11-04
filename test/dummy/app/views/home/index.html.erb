@@ -7,7 +7,7 @@
 
   <%= render FlatPack::Table::Component.new(
     data: @demo_rows,
-    style: "border: 0; border-radius: 0; box-shadow: none; background: transparent;"
+    style: :plain
   ) do |table| %>
     <% table.column(title: "Icon", html: ->(row) {
       RecordingStudioIcons.render_icon(self, row.recordable, class: "h-5 w-5") || content_tag(:span, "-", aria: { hidden: true })
