@@ -25,13 +25,13 @@ class HomeController < ApplicationController
     workspace = Workspace.includes(:folders, :pages).first || Workspace.new(name: "Studio Workspace")
     folder = workspace.folders.first || Folder.new(name: "Mix Folder", workspace: workspace)
     page = workspace.pages.first || Page.new(title: "Session Notes", workspace: workspace, folder: folder)
-    access = RecordingStudio::Access.first || RecordingStudio::Access.new(role: :admin)
+    access_type = "RecordingStudio::Access"
 
     @demo_rows = [
       demo_row("Workspace", workspace, "Root RecordingStudio model using a configured default icon.", "config/initializers/recording_studio_icons.rb"),
       demo_row("Folder", folder, "Real child model using a class-registered default icon.", "app/models/folder.rb"),
       demo_row("Page", page, "Real nested model using a class-registered default icon.", "app/models/page.rb"),
-      demo_row("Access", access, "RecordingStudio access recordable using a configured default icon.", "config/initializers/recording_studio_icons.rb")
+      demo_row("Access", access_type, "RecordingStudio access type using a configured default icon.", "config/initializers/recording_studio_icons.rb")
     ]
   end
 
@@ -121,8 +121,15 @@ class HomeController < ApplicationController
       recordable: recordable,
       details: RecordingStudioIcons.resolve_icon_details(recordable),
       notes: notes,
-      count: recordable.class.count,
+      count: demo_row_count(recordable),
       icon_set_in: icon_set_in
     )
+  end
+
+  def demo_row_count(recordable)
+    klass = recordable.is_a?(Class) ? recordable : recordable.class
+    return 0 unless klass < ActiveRecord::Base
+
+    klass.count
   end
 end
