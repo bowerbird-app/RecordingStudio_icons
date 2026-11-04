@@ -26,4 +26,5 @@ Then sign in at `http://localhost:3000` with:
 - Email: `admin@admin.com`
 - Password: `Password`
 
-The home page is the icon registry demo.
+The home page is the icon registry demo. The gem engine is mounted at
+`/recording_studio_icons` and uses Recording Studio's default layout.

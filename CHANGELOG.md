@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-11-04
+
+Engine screens use Recording Studio's default layout. The gem now depends on
+`recording_studio` `>= 6.3.0`.
+
+### Added
+- `recording_studio` `>= 6.3.0` in the gemspec. The root `Gemfile` pins Recording Studio tag `v6.3.0` and the same FlatPack tag the dummy already uses (`v0.1.341`) so Bundler can resolve `recording_studio`'s `flat_pack` requirement. Dummy pins are unchanged.
+- `RecordingStudioIcons.configuration.layout`, default `nil`. `nil` uses `RecordingStudio.configuration.layout`, then `recording_studio/default_layout`. `false` skips a layout. A String is a layout name. A callable is invoked as `call(controller:)` and must return a String, `nil`, or `false`.
+
+### Changed
+- Engine `ApplicationController` calls `recording_studio_layout { RecordingStudioIcons.configuration.layout }` instead of `layout "application"`.
+- The engine home view sets `content_for :title` and `content_for :subtitle` so the default layout renders one page title.
+
+### Upgrade notes
+- Hosts need Recording Studio 6.3.0 or newer.
+- Leave `layout` unset to keep the shared default. Set a layout name, `false`, or `->(controller:) { ... }` on this gem alone. `RecordingStudio.configure { |c| c.layout = ... }` still overrides every surface that did not set its own layout.
+- Replace `layout "application"` or `layout "recording_studio/default_layout"` on a host controller that renders these screens with `recording_studio_layout`.
+
 ## [0.1.3] - 2026-11-04
 
 Dummy app pins Recording Studio and FlatPack to current git tags so the lockfile
@@ -22,9 +40,6 @@ resolves Rails 8.1.4. The icon registry API is unchanged.
 ### Upgrade notes
 - Hosts do not need to change. The public registry API is unchanged.
 - Dummy-app development should `bundle install` in `test/dummy` after pulling this version so the tagged Recording Studio and FlatPack sources match the lockfile.
-
-[Unreleased]: https://github.com/bowerbird-app/recording_studio_icons/compare/v0.1.3...HEAD
-[0.1.3]: https://github.com/bowerbird-app/recording_studio_icons/compare/v0.1.2...v0.1.3
 
 ## [0.1.2] - 2026-11-02
 
@@ -73,6 +88,9 @@ renderers, and dummy demo are unchanged.
 - Install generator for host applications and a dummy app demo
 - Basic test suite with Minitest
 
+[Unreleased]: https://github.com/bowerbird-app/recording_studio_icons/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/bowerbird-app/recording_studio_icons/compare/v0.1.3...v0.2.0
+[0.1.3]: https://github.com/bowerbird-app/recording_studio_icons/compare/v0.1.2...v0.1.3
 [0.1.2]: https://github.com/bowerbird-app/recording_studio_icons/compare/v0.1.1...v0.1.2
 [0.1.1]: https://github.com/bowerbird-app/recording_studio_icons/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/bowerbird-app/recording_studio_icons/releases/tag/v0.1.0

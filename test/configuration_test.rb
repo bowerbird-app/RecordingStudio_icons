@@ -122,6 +122,38 @@ class ConfigurationTest < Minitest::Test
     assert_equal :solid, result.variant
   end
 
+  def test_layout_defaults_to_nil
+    assert_nil @configuration.layout
+  end
+
+  def test_layout_accepts_nil_false_name_and_keyword_callable
+    @configuration.layout = nil
+    assert_nil @configuration.layout
+
+    @configuration.layout = false
+    assert_equal false, @configuration.layout
+
+    @configuration.layout = "admin"
+    assert_equal "admin", @configuration.layout
+
+    callable = ->(controller:) { controller.nil? ? nil : "admin" }
+    @configuration.layout = callable
+    assert_same callable, @configuration.layout
+  end
+
+  def test_layout_rejects_blank_names_positional_callables_and_other_values
+    assert_raises(ArgumentError) { @configuration.layout = "" }
+    assert_raises(ArgumentError) { @configuration.layout = :application }
+    assert_raises(ArgumentError) { @configuration.layout = ->(_controller) { "admin" } }
+    assert_raises(ArgumentError) { @configuration.layout = Object.new }
+  end
+
+  def test_merge_applies_layout
+    @configuration.merge!(layout: "admin")
+
+    assert_equal "admin", @configuration.layout
+  end
+
   def test_to_h_includes_fallback_icon_when_present
     @configuration.fallback_icon = { library: :heroicons, name: "folder", variant: :outline }
 
