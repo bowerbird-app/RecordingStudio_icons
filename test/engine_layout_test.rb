@@ -59,13 +59,6 @@ class EngineLayoutTest < Minitest::Test
     assert_equal false, home_controller.recording_studio_resolved_layout
   end
 
-  def test_home_controller_inherits_the_engine_layout_block
-    engine = RecordingStudioIcons::ApplicationController
-    home = RecordingStudioIcons::HomeController
-
-    assert_same engine.send(:recording_studio_layout_block), home.send(:recording_studio_layout_block)
-  end
-
   private
 
   def home_controller

@@ -18,7 +18,7 @@ Engine screens use Recording Studio's default layout. The gem now depends on
 
 ### Changed
 - Engine `ApplicationController` calls `recording_studio_layout { RecordingStudioIcons.configuration.layout }` instead of `layout "application"`.
-- The engine home view sets `content_for :title` and `content_for :subtitle` so the default layout renders one page title.
+- The engine home view sets `content_for :title` and `content_for :subtitle` so the default layout renders one page title. The old in-page heading and description text is gone. The page is title and subtitle only.
 
 ### Upgrade notes
 - Hosts need Recording Studio 6.3.0 or newer.

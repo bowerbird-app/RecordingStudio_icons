@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require_relative "hooks"
+require_relative "configuration/layout"
 
 module RecordingStudioIcons
   module ConfigurationHelpers
@@ -35,6 +36,8 @@ module RecordingStudioIcons
   end
 
   class Configuration
+    include Layout
+
     MAP_MERGERS = { "default_icons" => :default_icon, "override_icons" => :override_icon }.freeze
     ATTRIBUTE_WRITERS = {
       "fallback_icon" => :fallback_icon=, "default_library" => :default_library=,
@@ -43,7 +46,7 @@ module RecordingStudioIcons
     }.freeze
 
     attr_reader :hooks, :default_library, :default_variant, :raise_on_missing_renderer, :default_icons,
-                :override_icons, :fallback_icon, :layout
+                :override_icons, :fallback_icon
 
     def initialize
       @default_icons = {}.freeze
@@ -55,11 +58,6 @@ module RecordingStudioIcons
       @layout = nil
       @hooks = Hooks.new
       @mutex = Mutex.new
-    end
-
-    def layout=(value)
-      require "recording_studio/layout"
-      @mutex.synchronize { @layout = RecordingStudio::Layout.accept(value) }
     end
 
     def default_library=(library)

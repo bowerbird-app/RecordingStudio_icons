@@ -213,8 +213,11 @@ end
 
 ## RecordingStudio integration
 
-This gem depends on `recording_studio` `>= 6.3.0`. Recordables already resolve to class-name
-strings, so each recordable type can be a registered type in the icon registry.
+This gem depends on `recording_studio` `>= 6.3.0`.
+
+`RecordingStudio` is a natural fit because its recordables already resolve cleanly to class-name
+strings. If you are using the gem with `RecordingStudio`, you can treat each recordable type as a
+registered type in the icon registry.
 
 ## For addon authors
 

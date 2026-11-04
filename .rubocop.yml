@@ -21,7 +21,6 @@ Metrics/ClassLength:
   Exclude:
     - 'test/**/*'
     - 'lib/recording_studio_icons/hooks.rb'
-    - 'lib/recording_studio_icons/configuration.rb'
 
 Metrics/MethodLength:
   Exclude:
