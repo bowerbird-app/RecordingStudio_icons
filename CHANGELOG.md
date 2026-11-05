@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.1] - 2026-11-05
+
+Lockfiles pick up Rails 8.1.4.1 and the matching sanitizer/SSH floors.
+
+### Changed
+- Root and dummy `Gemfile.lock` files resolve Rails `8.1.4.1`. Dummy also locks `net-ssh` `7.3.8`.
+
 ## [0.2.0] - 2026-11-04
 
 Engine screens use Recording Studio's default layout. The gem now depends on
