@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- Root and dummy `Gemfile` pins move `recording_studio` to tag `v6.7.0` and `flat_pack` to tag `v0.1.356`. Lockfiles were regenerated. The gemspec floor stays `recording_studio` `>= 6.3.0`.
+
 ## [0.2.1] - 2026-11-05
 
 Lockfiles pick up Rails 8.1.4.1 and the matching sanitizer/SSH floors.
