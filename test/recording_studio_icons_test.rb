@@ -51,8 +51,8 @@ class RecordingStudioIconsTest < Minitest::Test
   def test_dummy_gemfile_pins_recording_studio_and_flat_pack_tags
     gemfile = File.read(File.expand_path("dummy/Gemfile", __dir__))
 
-    assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio", tag: "v6.3.0"'
-    assert_includes gemfile, 'github: "bowerbird-app/flatpack", tag: "v0.1.341"'
+    assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio", tag: "v6.7.0"'
+    assert_includes gemfile, 'github: "bowerbird-app/flatpack", tag: "v0.1.356"'
   end
 
   def test_dummy_readme_matches_heroicons_demo
