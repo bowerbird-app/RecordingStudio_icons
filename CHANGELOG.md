@@ -8,7 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Changed
-- Root and dummy `Gemfile` pins move `recording_studio` to tag `v6.7.0` and `flat_pack` to tag `v0.1.356`. Lockfiles were regenerated. The gemspec floor stays `recording_studio` `>= 6.3.0`.
+- Root and dummy `Gemfile` pins move `recording_studio` to tag `v6.10.0` and `flat_pack` to tag `v0.1.366`. Lockfiles were regenerated. The gemspec floor stays `recording_studio` `>= 6.3.0`.
+- Dummy copies Recording Studio's `root_recording_id` events migration so event rows match core 6.9 and later.
 
 ## [0.2.1] - 2026-11-05
 
