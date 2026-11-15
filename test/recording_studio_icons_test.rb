@@ -4,7 +4,7 @@ require "test_helper"
 
 class RecordingStudioIconsTest < Minitest::Test
   def test_version_exists
-    assert_equal "0.2.1", ::RecordingStudioIcons::VERSION
+    assert_equal "0.3.0", ::RecordingStudioIcons::VERSION
   end
 
   def test_engine_exists
@@ -51,12 +51,20 @@ class RecordingStudioIconsTest < Minitest::Test
   def test_dummy_gemfile_pins_recording_studio_and_flat_pack_tags
     gemfile = File.read(File.expand_path("dummy/Gemfile", __dir__))
 
-    assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio", tag: "v6.10.0"'
+    assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio", tag: "v7.0.0"'
     assert_includes gemfile, 'github: "bowerbird-app/flatpack", tag: "v0.1.366"'
 
     root_gemfile = File.read(File.expand_path("../Gemfile", __dir__))
-    assert_includes root_gemfile, 'github: "bowerbird-app/RecordingStudio", tag: "v6.10.0"'
+    assert_includes root_gemfile, 'github: "bowerbird-app/RecordingStudio", tag: "v7.0.0"'
     assert_includes root_gemfile, 'github: "bowerbird-app/flatpack", tag: "v0.1.366"'
+  end
+
+  def test_gemspec_opens_recording_studio_on_core_seven
+    gemspec = File.read(File.expand_path("../recording_studio_icons.gemspec", __dir__))
+
+    assert_includes gemspec, 'spec.add_dependency "recording_studio", ">= 7.0", "< 8.0"'
+    assert_includes gemspec, 'spec.add_dependency "rails", ">= 8.1.0"'
+    refute_includes gemspec, "~>"
   end
 
   def test_dummy_readme_matches_heroicons_demo
