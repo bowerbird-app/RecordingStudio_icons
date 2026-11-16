@@ -195,20 +195,14 @@ The engine automatically:
 
 - includes `RecordingStudioIcons::ViewHelper` in controllers via `helper RecordingStudioIcons::ViewHelper`
 - merges `Rails.application.config.recording_studio_icons` after Rails loads initializers
-- runs lifecycle hooks before config merge, on configuration merge, and after initialization
+
+Register a custom renderer from a normal Rails initializer. Service hooks live on
+`RecordingStudio.configuration.hooks` in Recording Studio 7.1 and later.
 
 In views, you can render through the helper instead of calling the registry directly:
 
 ```erb
 <%= render_recording_studio_icon(Page, class: "h-5 w-5") %>
-```
-
-Hook registration lives on `RecordingStudioIcons.configuration.hooks`:
-
-```ruby
-RecordingStudioIcons.configuration.hooks.after_initialize do
-  RecordingStudioIcons.register_renderer(:custom, MyCustomRenderer)
-end
 ```
 
 ## RecordingStudio integration

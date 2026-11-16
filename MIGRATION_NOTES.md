@@ -11,7 +11,7 @@ This file is now historical status documentation for the repository, not an acti
 
 ## Current sources of truth
 
-- `README.md` documents installation, configuration, rendering, and hook integration.
+- `README.md` documents installation, configuration, and rendering.
 - `test/dummy/README.md` documents the runnable demo app.
 - `docs/gem_template/` remains preserved template-reference material only.
 

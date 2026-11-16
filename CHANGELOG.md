@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-11-16
+
+Removes the unused per-gem hook registry. Icon registration is unchanged. The gemspec still requires `recording_studio` `>= 7.0` and `< 8.0`.
+
+### Removed
+- `RecordingStudioIcons::Hooks`, `RecordingStudioIcons.configuration.hooks`, and the `hooks_registered` key in `Configuration#to_h`.
+- Engine initializers `recording_studio_icons.before_initialize` and `recording_studio_icons.after_initialize`. `load_config` still merges host config. It no longer runs an `on_configuration` hook.
+- `docs/gem_template/HOOKS.md`.
+
+### Upgrade notes
+- `RecordingStudioIcons::Hooks`, `configuration.hooks`, and the `hooks_registered` key in `configuration.to_h` are removed.
+- Hosts with boot-time code should use a normal Rails initializer.
+- Service hooks live in `RecordingStudio.configuration.hooks` (core >= 7.1).
+
 ## [0.3.0] - 2026-11-15
 
 Requires Recording Studio 7.0 or newer, and below 8.0. The icon registry API is unchanged.
@@ -108,7 +122,8 @@ renderers, and dummy demo are unchanged.
 - Install generator for host applications and a dummy app demo
 - Basic test suite with Minitest
 
-[Unreleased]: https://github.com/bowerbird-app/recording_studio_icons/compare/v0.2.0...HEAD
+[Unreleased]: https://github.com/bowerbird-app/recording_studio_icons/compare/v0.4.0...HEAD
+[0.4.0]: https://github.com/bowerbird-app/recording_studio_icons/compare/v0.3.0...v0.4.0
 [0.2.0]: https://github.com/bowerbird-app/recording_studio_icons/compare/v0.1.3...v0.2.0
 [0.1.3]: https://github.com/bowerbird-app/recording_studio_icons/compare/v0.1.2...v0.1.3
 [0.1.2]: https://github.com/bowerbird-app/recording_studio_icons/compare/v0.1.1...v0.1.2

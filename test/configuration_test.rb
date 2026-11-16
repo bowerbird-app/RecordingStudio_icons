@@ -42,15 +42,19 @@ class ConfigurationTest < Minitest::Test
     assert_equal original[:default_icons], @configuration.to_h[:default_icons]
   end
 
-  def test_to_h_reports_registered_hook_counts
-    @configuration.hooks.before_initialize { nil }
-    @configuration.hooks.before_initialize { nil }
-    @configuration.hooks.after_initialize { nil }
-
+  def test_to_h_lists_icon_settings
     result = @configuration.to_h
 
-    assert_equal 2, result.fetch(:hooks_registered).fetch(:before_initialize)
-    assert_equal 1, result.fetch(:hooks_registered).fetch(:after_initialize)
+    assert_equal %i[
+      default_icons
+      override_icons
+      fallback_icon
+      default_library
+      default_variant
+      raise_on_missing_renderer
+      layout
+    ], result.keys
+    refute_respond_to @configuration, :hooks
   end
 
   def test_configure_without_block_is_safe
