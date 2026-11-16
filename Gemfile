@@ -5,8 +5,8 @@ source "https://rubygems.org"
 # Specify your gem's dependencies in recording_studio_icons.gemspec
 gemspec
 
-gem "flat_pack", github: "bowerbird-app/flatpack", tag: "v0.1.366"
-gem "recording_studio", github: "bowerbird-app/RecordingStudio", tag: "v7.0.0"
+gem "flat_pack", github: "bowerbird-app/flatpack", tag: "v0.1.377"
+gem "recording_studio", github: "bowerbird-app/RecordingStudio", tag: "v7.3.0"
 
 gem "puma"
 gem "sprockets-rails"

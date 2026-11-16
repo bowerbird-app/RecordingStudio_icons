@@ -327,7 +327,7 @@ It demonstrates:
 - multi-library rendering (`:heroicons` plus a custom renderer)
 - resolved metadata shown in the UI
 
-The dummy `Gemfile` pins `recording_studio` to git tag `v7.0.0` and `flat_pack` to git tag `v0.1.366` (FlatPack is not on RubyGems). After a pull, run `bundle install` in `test/dummy` so those tags match the lockfile. The dummy also copies the core 6.9 events migration that adds `recording_studio_events.root_recording_id`.
+The dummy `Gemfile` pins `recording_studio` to git tag `v7.3.0` and `flat_pack` to git tag `v0.1.377` (FlatPack is not on RubyGems). After a pull, run `bundle install` in `test/dummy` so those tags match the lockfile. The dummy also copies the core 6.9 events migration that adds `recording_studio_events.root_recording_id`.
 
 Run it with:
 
