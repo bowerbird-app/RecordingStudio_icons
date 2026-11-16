@@ -9,7 +9,6 @@ require "recording_studio_icons/renderer_registry"
 require "recording_studio_icons/registry"
 require "recording_studio_icons/view_helper"
 require "recording_studio_icons/renderers/heroicons"
-require "recording_studio_icons/hooks"
 require "recording_studio_icons/configuration"
 require "recording_studio_icons/engine"
 

@@ -65,7 +65,6 @@ A template for building **Rails mountable engine gems** with PostgreSQL UUID pri
 | [Private Gems](PRIVATE_GEMS.md) | How to authenticate and access private gem dependencies in Codespaces, local, and production environments. |
 | [Database Migrations](MIGRATIONS.md) | How to generate and manage database migrations for the engine. |
 | [Service Objects](SERVICES.md) | Explanation of the Service Object pattern and Result monad used for business logic. |
-| [Engine Hooks](HOOKS.md) | Guide to customizing engine behavior using lifecycle and service hooks. |
 | [Asset Architecture](CSS_JS_ASSETS_ARCHITECTURE.md) | Details on TailwindCSS setup and asset pipeline integration. |
 | [Security](SECURITY.md) | Security considerations. |
 | [Changelog](../../CHANGELOG.md) | Version history. |

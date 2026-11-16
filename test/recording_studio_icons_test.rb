@@ -4,7 +4,7 @@ require "test_helper"
 
 class RecordingStudioIconsTest < Minitest::Test
   def test_version_exists
-    assert_equal "0.3.0", ::RecordingStudioIcons::VERSION
+    assert_equal "0.4.0", ::RecordingStudioIcons::VERSION
   end
 
   def test_engine_exists

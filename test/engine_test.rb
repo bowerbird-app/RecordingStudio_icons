@@ -5,30 +5,18 @@ require "test_helper"
 class EngineTest < Minitest::Test
   include IsolatedIconRegistry
 
-  def test_before_and_after_initialize_initializers_run_hooks
-    before_called = false
-    after_called = false
-
-    RecordingStudioIcons.configuration.hooks.before_initialize { |_engine| before_called = true }
-    RecordingStudioIcons.configuration.hooks.after_initialize { |_engine| after_called = true }
-
-    find_initializer("recording_studio_icons.before_initialize").block.call(Object.new)
-    find_initializer("recording_studio_icons.after_initialize").block.call(Object.new)
-
-    assert before_called
-    assert after_called
-  end
-
   ConfigStub = Struct.new(:recording_studio_icons)
 
-  def test_load_config_merges_initializer_source_and_runs_on_configuration_hook
-    hook_called = false
-    hook_payload = nil
-    RecordingStudioIcons.configuration.hooks.on_configuration do |cfg|
-      hook_called = true
-      hook_payload = cfg
-    end
+  def test_engine_keeps_config_merge_and_view_helper_initializers
+    names = RecordingStudioIcons::Engine.initializers.map(&:name)
 
+    assert_includes names, "recording_studio_icons.load_config"
+    assert_includes names, "recording_studio_icons.view_helpers"
+    refute_includes names, "recording_studio_icons.before_initialize"
+    refute_includes names, "recording_studio_icons.after_initialize"
+  end
+
+  def test_load_config_merges_initializer_source
     app = Struct.new(:config).new(
       ConfigStub.new(
         {
@@ -40,8 +28,6 @@ class EngineTest < Minitest::Test
 
     find_initializer("recording_studio_icons.load_config").block.call(app)
 
-    assert hook_called
-    assert_equal RecordingStudioIcons.configuration, hook_payload
     assert_equal :custom, RecordingStudioIcons.configuration.default_library
     assert_equal "folder", RecordingStudioIcons.configuration.default_icons["Workspace"].name
   end
