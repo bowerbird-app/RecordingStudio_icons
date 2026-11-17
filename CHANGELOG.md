@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.1] - 2026-11-17
+
+### Changed
+- Root and dummy `Gemfile` pins move `recording_studio` to tag `v7.4.0`. No host changes needed.
+
 ## [0.4.0] - 2026-11-16
 
 Removes the unused per-gem hook registry. Icon registration is unchanged. The gemspec still requires `recording_studio` `>= 7.0` and `< 8.0`.
@@ -122,7 +127,8 @@ renderers, and dummy demo are unchanged.
 - Install generator for host applications and a dummy app demo
 - Basic test suite with Minitest
 
-[Unreleased]: https://github.com/bowerbird-app/recording_studio_icons/compare/v0.4.0...HEAD
+[Unreleased]: https://github.com/bowerbird-app/recording_studio_icons/compare/v0.4.1...HEAD
+[0.4.1]: https://github.com/bowerbird-app/recording_studio_icons/compare/v0.4.0...v0.4.1
 [0.4.0]: https://github.com/bowerbird-app/recording_studio_icons/compare/v0.3.0...v0.4.0
 [0.2.0]: https://github.com/bowerbird-app/recording_studio_icons/compare/v0.1.3...v0.2.0
 [0.1.3]: https://github.com/bowerbird-app/recording_studio_icons/compare/v0.1.2...v0.1.3
