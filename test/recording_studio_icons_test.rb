@@ -4,7 +4,7 @@ require "test_helper"
 
 class RecordingStudioIconsTest < Minitest::Test
   def test_version_exists
-    assert_equal "0.4.1", ::RecordingStudioIcons::VERSION
+    assert_equal "0.4.2", ::RecordingStudioIcons::VERSION
   end
 
   def test_engine_exists
@@ -51,12 +51,12 @@ class RecordingStudioIconsTest < Minitest::Test
   def test_dummy_gemfile_pins_recording_studio_and_flat_pack_tags
     gemfile = File.read(File.expand_path("dummy/Gemfile", __dir__))
 
-    assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio", tag: "v7.4.0"'
-    assert_includes gemfile, 'github: "bowerbird-app/flatpack", tag: "v0.1.377"'
+    assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio", tag: "v7.7.1"'
+    assert_includes gemfile, 'github: "bowerbird-app/flatpack", tag: "v0.1.378"'
 
     root_gemfile = File.read(File.expand_path("../Gemfile", __dir__))
-    assert_includes root_gemfile, 'github: "bowerbird-app/RecordingStudio", tag: "v7.4.0"'
-    assert_includes root_gemfile, 'github: "bowerbird-app/flatpack", tag: "v0.1.377"'
+    assert_includes root_gemfile, 'github: "bowerbird-app/RecordingStudio", tag: "v7.7.1"'
+    assert_includes root_gemfile, 'github: "bowerbird-app/flatpack", tag: "v0.1.378"'
   end
 
   def test_gemspec_opens_recording_studio_on_core_seven
