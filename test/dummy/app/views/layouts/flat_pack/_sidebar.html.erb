@@ -10,28 +10,28 @@
   <% sidebar.items do %>
     <nav class="py-4 space-y-1" aria-label="Main navigation">
       <%= render FlatPack::Sidebar::Item::Component.new(
-        label: "Home",
+        text: "Home",
         href: root_path,
         icon: :home,
         active: current_page?(root_path)
       ) %>
 
       <%= render FlatPack::Sidebar::Item::Component.new(
-        label: "Use icon",
+        text: "Use icon",
         href: basic_use_guide_path,
         icon: :code_bracket,
         active: current_page?(basic_use_guide_path)
       ) %>
 
       <%= render FlatPack::Sidebar::Item::Component.new(
-        label: "Set icon",
+        text: "Set icon",
         href: set_icon_guide_path,
         icon: :bookmark_square,
         active: current_page?(set_icon_guide_path)
       ) %>
 
       <%= render FlatPack::Sidebar::Item::Component.new(
-        label: "Configuration",
+        text: "Configuration",
         href: configuration_reference_guide_path,
         icon: :cog_6_tooth,
         active: current_page?(configuration_reference_guide_path)
@@ -43,7 +43,7 @@
   <% sidebar.footer do %>
     <%= render FlatPack::Sidebar::Footer::Component.new(class: "text-sm text-[var(--surface-muted-content-color)]") do %>
       <%= render FlatPack::Sidebar::Item::Component.new(
-        label: "Sign out",
+        text: "Sign out",
         href: destroy_user_session_path,
         icon: :lock,
         class: "mx-0",

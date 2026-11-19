@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - Root and dummy `Gemfile` pins move `recording_studio` to `~> 7.8` at tag `v7.8.0` and `flat_pack` to `~> 0.2` at tag `v0.2.0`. The gemspec still requires `recording_studio` `>= 7.0` and `< 8.0`.
+- Dummy sign-in card uses `background:` and sidebar items use `text:`, which FlatPack 0.2 requires.
 
 ### Upgrade notes
 - Hosts MUST run the Recording Studio 7.4, 7.5 and 7.7 migrations if they have not.
