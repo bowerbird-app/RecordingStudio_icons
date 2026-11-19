@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.5.0] - 2026-11-19
+
+### Changed
+- Root and dummy `Gemfile` pins move `recording_studio` to `~> 7.8` at tag `v7.8.0` and `flat_pack` to `~> 0.2` at tag `v0.2.0`. The gemspec still requires `recording_studio` `>= 7.0` and `< 8.0`.
+
+### Upgrade notes
+- Hosts MUST run the Recording Studio 7.4, 7.5 and 7.7 migrations if they have not.
+- flat_pack 0.2.0 is supported; hosts moving to 0.2 must remove the manual `flat_pack/heroicons` importmap pin and any `flat-pack--icon` controller registration.
+- Development checkouts that follow these pins need Recording Studio `v7.8.0` and FlatPack `v0.2.0`.
+
 ## [0.4.2] - 2026-11-18
 
 ### Changed
@@ -135,7 +145,8 @@ renderers, and dummy demo are unchanged.
 - Install generator for host applications and a dummy app demo
 - Basic test suite with Minitest
 
-[Unreleased]: https://github.com/bowerbird-app/recording_studio_icons/compare/v0.4.2...HEAD
+[Unreleased]: https://github.com/bowerbird-app/recording_studio_icons/compare/v0.5.0...HEAD
+[0.5.0]: https://github.com/bowerbird-app/recording_studio_icons/compare/v0.4.2...v0.5.0
 [0.4.2]: https://github.com/bowerbird-app/recording_studio_icons/compare/v0.4.1...v0.4.2
 [0.4.1]: https://github.com/bowerbird-app/recording_studio_icons/compare/v0.4.0...v0.4.1
 [0.4.0]: https://github.com/bowerbird-app/recording_studio_icons/compare/v0.3.0...v0.4.0
